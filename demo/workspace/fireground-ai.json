@@ -1,0 +1,23 @@
+{
+  "project": "fireground-ai",
+  "name": "Fireground AI",
+  "ends_ago_minutes": 18,
+  "events": [
+    {"occurred_at": "2026-09-28T09:10:00", "source": "note", "event_type": "goal",
+     "text": "Goal: RTL accelerator for the Fireground smoke-detection CNN (int8 3x3 conv layers) on a Zynq-7020. Target 30 fps at 640x480 under 2 W."},
+    {"occurred_at": "2026-09-29T17:40:00", "source": "git_commit", "ref": "a81f3e2",
+     "text": "commit a81f3e2: 8x8 conv3x3 PE array with int8 MAC units, 3-row line buffers"},
+    {"occurred_at": "2026-09-30T11:15:00", "source": "test_output", "ref": "cocotb_pe_0930.xml",
+     "text": "cocotb: test_pe_array 48/48 pass, test_line_buffer 6/6 pass."},
+    {"occurred_at": "2026-10-01T10:05:00", "source": "note", "event_type": "decision",
+     "text": "Decision: stream input through a sliding-window controller over the 3 line buffers instead of im2col in DDR. Reason: im2col needs ~9x DDR reads; sliding window cuts DDR bandwidth by ~70%. Tradeoff: more complex control logic for stride/padding."},
+    {"occurred_at": "2026-10-03T16:30:00", "source": "git_commit", "ref": "c02d9b7",
+     "text": "commit c02d9b7: sliding_window_ctrl.sv first version, supports stride 1 and 2, SAME padding"},
+    {"occurred_at": "2026-10-04T14:20:00", "source": "test_output", "ref": "cocotb_sw_1004.xml",
+     "text": "cocotb test_sliding_window: 11/14 pass. FAIL: stride2_edge_right, stride2_edge_bottom, padding_same_border. Window advances one pixel too far at row end when stride=2."},
+    {"occurred_at": "2026-10-06T10:00:00", "source": "git_commit", "ref": "e4b18a0",
+     "text": "commit e4b18a0: fix column counter wrap for stride 2 in sliding_window_ctrl (suspected off-by-one)"},
+    {"occurred_at": "2026-10-06T10:20:00", "source": "note",
+     "text": "Haven't re-run the regression after the col counter fix yet. Next: verify the sliding-window controller - rerun test_sliding_window and the full 640x480 frame testbench."}
+  ]
+}

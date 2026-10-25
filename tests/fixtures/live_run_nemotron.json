@@ -1,0 +1,433 @@
+{
+ "_about": "Operations proposed by nvidia/nemotron-3-super-120b-a12b in the first live run (live.db, 2026-10-08). Recorded model output, replayed in tests to pin down failures seen live.",
+ "E1": [
+  {
+   "op": "ADD",
+   "field": "goal",
+   "value": "1024-point streaming FFT accelerator with AXI4-Stream in/out on Arty A7-100T. Target clock 200 MHz, must stay under 60% LUTs.",
+   "verification": "reported",
+   "confidence": "medium",
+   "evidence_ids": [
+    "E1"
+   ],
+   "rationale": "New evidence defines the project goal."
+  },
+  {
+   "op": "UPDATE",
+   "field": "last_action",
+   "value": "Defined goal: 1024-point streaming FFT accelerator with AXI4-Stream in/out on Arty A7-100T. Target clock 200 MHz, must stay under 60% LUTs.",
+   "verification": "reported",
+   "confidence": "medium",
+   "evidence_ids": [
+    "E1"
+   ],
+   "rationale": "Setting the goal constitutes the most recent action."
+  }
+ ],
+ "E2": [
+  {
+   "op": "UPDATE",
+   "target_claim_id": "C2",
+   "field": "last_action",
+   "value": "Added radix-2 DIT butterfly, twiddle ROM generator and top-level fft_core.v via commit 3f2a91c",
+   "verification": "verified",
+   "confidence": "high",
+   "evidence_ids": [
+    "E2"
+   ],
+   "rationale": "New git commit shows implementation progress on the FFT core."
+  }
+ ],
+ "E3": [
+  {
+   "op": "ADD",
+   "field": "current_blocker",
+   "value": "Bit-reversed output ordering missing in FFT core output causing mismatch with numpy reference for bins 512-1023.",
+   "verification": "verified",
+   "confidence": "high",
+   "evidence_ids": [
+    "E3"
+   ],
+   "rationale": "Simulation log shows failed vectors due to missing bit-reversed ordering, indicating a blocker to correct functionality."
+  },
+  {
+   "op": "ADD",
+   "field": "attempts",
+   "value": "Simulated fft_core using tb_fft_core; 9/12 vectors failed; output bins 512-1023 mismatch numpy reference; identified missing bit-reversed output ordering.",
+   "verification": "verified",
+   "confidence": "high",
+   "evidence_ids": [
+    "E3"
+   ],
+   "rationale": "Record the simulation attempt and its outcome as historical data."
+  }
+ ],
+ "E4": [
+  {
+   "op": "ADD",
+   "field": "decisions",
+   "value": "Decision: dropping the memory-based radix-2 DIT design. Switching to a radix-2^2 single-path delay feedback (R2SDF) pipeline: natural fit for streaming and fewer multipliers. Output reorder buffer handles bit reversal.",
+   "verification": "reported",
+   "confidence": "medium",
+   "evidence_ids": [
+    "E4"
+   ],
+   "rationale": "Record decision to change FFT architecture to address bit-reversal blocker."
+  }
+ ],
+ "E5": [
+  {
+   "op": "UPDATE",
+   "target_claim_id": "C3",
+   "field": "last_action",
+   "value": "Implemented R2SDF pipeline (10 stages) + output reorder buffer + AXI4-Stream wrapper via commit 9c41d07",
+   "verification": "verified",
+   "confidence": "high",
+   "evidence_ids": [
+    "E5"
+   ],
+   "rationale": "New git commit adds R2SDF pipeline implementation, representing the most recent concrete action."
+  }
+ ],
+ "E6": [
+  {
+   "op": "UPDATE",
+   "target_claim_id": "C7",
+   "field": "last_action",
+   "value": "Ran simulation tb_axis_fft; 10/12 PASS, backpressure_random and backpressure_burst FAIL - samples dropped when m_axis_tready deasserts >2 cycles.",
+   "verification": "verified",
+   "confidence": "high",
+   "evidence_ids": [
+    "E6"
+   ],
+   "rationale": "New simulation log shows test results; updates most recent action."
+  },
+  {
+   "op": "ADD",
+   "field": "current_status",
+   "value": "Backpressure handling needs improvement (10/12 PASS, backpressure_random/burst FAIL).",
+   "verification": "verified",
+   "confidence": "high",
+   "evidence_ids": [
+    "E6"
+   ],
+   "rationale": "New simulation log indicates partial failure, updating project status."
+  },
+  {
+   "op": "ADD",
+   "field": "attempts",
+   "value": "Simulated tb_axis_fft to verify backpressure behavior; 10/12 PASS, FAIL on backpressure_random and backpressure_burst due to samples dropped when m_axis_tready deasserts >2 cycles.",
+   "verification": "verified",
+   "confidence": "high",
+   "evidence_ids": [
+    "E6"
+   ],
+   "rationale": "Record test attempt and outcome from new simulation log."
+  }
+ ],
+ "E7": [
+  {
+   "op": "UPDATE",
+   "target_claim_id": "C8",
+   "field": "last_action",
+   "value": "Ran simulation tb_axis_fft; 12/12 PASS including backpressure_random and backpressure_burst after adding skid buffer on output.",
+   "verification": "verified",
+   "confidence": "high",
+   "evidence_ids": [
+    "E7"
+   ],
+   "rationale": "New simulation shows all tests pass after adding skid buffer."
+  },
+  {
+   "op": "UPDATE",
+   "target_claim_id": "C9",
+   "field": "current_status",
+   "value": "Backpressure handling resolved (12/12 PASS after adding skid buffer).",
+   "verification": "verified",
+   "confidence": "high",
+   "evidence_ids": [
+    "E7"
+   ],
+   "rationale": "Simulation indicates backpressure tests now pass."
+  },
+  {
+   "op": "ADD",
+   "value": "Added skid buffer on output of axis_fft wrapper; simulation tb_axis_fft: 12/12 PASS including backpressure_random and backpressure_burst.",
+   "verification": "verified",
+   "confidence": "high",
+   "evidence_ids": [
+    "E7"
+   ],
+   "rationale": "Record new attempt to improve backpressure handling."
+  },
+  {
+   "op": "CONTRADICT",
+   "target_claim_id": "C4",
+   "field": "current_blocker",
+   "value": "Simulation shows no mismatch (max error 2.1e-4), indicating bit-reversed output ordering is present.",
+   "evidence_ids": [
+    "E7"
+   ],
+   "rationale": "New simulation passes all tests, contradicting claim that bit-reversed output ordering is missing."
+  }
+ ],
+ "E8": [
+  {
+   "op": "UPDATE",
+   "target_claim_id": "C11",
+   "field": "last_action",
+   "value": "Ran Vivado synthesis; post-synthesis timing @200 MHz shows WNS -0.842 ns, 37 failing endpoints; LUT utilization 52%, FF 31%, DSP48E1 24%.",
+   "verification": "verified",
+   "confidence": "high",
+   "evidence_ids": [
+    "E8"
+   ],
+   "rationale": "New synthesis report shows timing failure and resource utilization."
+  },
+  {
+   "op": "UPDATE",
+   "target_claim_id": "C12",
+   "field": "current_status",
+   "value": "Post-synthesis timing fails at 200 MHz (WNS -0.842 ns, 37 failing endpoints); LUT utilization 52% meets goal (<60%).",
+   "verification": "verified",
+   "confidence": "high",
+   "evidence_ids": [
+    "E8"
+   ],
+   "rationale": "Synthesis indicates timing not met, resource utilization within limit."
+  },
+  {
+   "op": "UPDATE",
+   "target_claim_id": "C4",
+   "field": "current_blocker",
+   "value": "Timing fails at 200 MHz (WNS -0.842 ns, 37 failing endpoints); critical path in stage4 complex multiplier.",
+   "verification": "verified",
+   "confidence": "high",
+   "evidence_ids": [
+    "E8"
+   ],
+   "rationale": "New blocker identified from synthesis timing results; previous blocker about bit-reversed ordering contradicted by earlier evidence."
+  },
+  {
+   "op": "ADD",
+   "field": "status_items",
+   "key": "timing",
+   "value": "WNS -0.842 ns, 37 failing endpoints at 200 MHz; LUT utilization 52%",
+   "verification": "verified",
+   "confidence": "high",
+   "evidence_ids": [
+    "E8"
+   ],
+   "rationale": "Capture timing status from synthesis report."
+  }
+ ],
+ "E9": [
+  {
+   "op": "UPDATE",
+   "target_claim_id": "C13",
+   "field": "last_action",
+   "value": "Added 2 pipeline register stages inside the complex multiplier of every stage (+2 cycles latency) as an attempt to improve timing.",
+   "verification": "reported",
+   "confidence": "medium",
+   "evidence_ids": [
+    "E9"
+   ],
+   "rationale": "New evidence E9 reports a design change attempt; updates last_action to most recent concrete action."
+  },
+  {
+   "op": "ADD",
+   "field": "attempts",
+   "value": "Added 2 pipeline register stages inside the complex multiplier of every stage (+2 cycles latency); outcome not yet measured.",
+   "verification": "reported",
+   "confidence": "medium",
+   "evidence_ids": [
+    "E9"
+   ],
+   "rationale": "Record the new attempt in the attempts history."
+  }
+ ],
+ "E10": [
+  {
+   "op": "UPDATE",
+   "target_claim_id": "C14",
+   "field": "current_status",
+   "value": "Post-synthesis timing fails at 200 MHz (WNS -0.118 ns, 4 failing endpoints); LUT utilization 68% exceeds goal (<60%).",
+   "verification": "verified",
+   "confidence": "high",
+   "evidence_ids": [
+    "E10"
+   ],
+   "rationale": "New route_design report shows improved timing but still failing and LUT utilization above goal."
+  },
+  {
+   "op": "UPDATE",
+   "target_claim_id": "C15",
+   "field": "current_blocker",
+   "value": "Timing fails at 200 MHz (WNS -0.118 ns, 4 failing endpoints); critical path in stage7 twiddle ROM -> multiplier path.",
+   "verification": "verified",
+   "confidence": "high",
+   "evidence_ids": [
+    "E10"
+   ],
+   "rationale": "Route report indicates remaining failures are on stage7 twiddle ROM to multiplier path."
+  },
+  {
+   "op": "UPDATE",
+   "target_claim_id": "C16",
+   "field": "timing",
+   "value": "WNS -0.118 ns, 4 failing endpoints at 200 MHz; LUT utilization 68%",
+   "verification": "verified",
+   "confidence": "high",
+   "evidence_ids": [
+    "E10"
+   ],
+   "rationale": "Updated timing and utilization from route_design report."
+  }
+ ],
+ "E11": [
+  {
+   "op": "ADD",
+   "field": "next_step",
+   "value": "Begin hardware testing",
+   "verification": "reported",
+   "confidence": "medium",
+   "evidence_ids": [
+    "E11"
+   ],
+   "rationale": "Human note indicates design is ready for hardware testing, suggesting next step is to begin hardware testing."
+  },
+  {
+   "op": "CONTRADICT",
+   "target_claim_id": "C19",
+   "field": "current_status",
+   "value": "Note claims timing is met and design ready for hardware testing, contradicting verified timing failure.",
+   "evidence_ids": [
+    "E11"
+   ],
+   "rationale": "E11 reports timing met, which conflicts with verified claim C19 that timing fails at 200 MHz."
+  },
+  {
+   "op": "CONTRADICT",
+   "target_claim_id": "C20",
+   "field": "current_blocker",
+   "value": "Note claims timing is met, contradicting verified blocker due to timing failure.",
+   "evidence_ids": [
+    "E11"
+   ],
+   "rationale": "E11 reports timing met, conflicting with verified blocker C20 stating timing fails at 200 MHz."
+  }
+ ],
+ "E12": [
+  {
+   "op": "NOOP",
+   "rationale": "E12 is a late-arriving historical note; it does not alter current fields established by newer evidence (e.g., next_step, current_blocker, current_status). No state change is required."
+  }
+ ],
+ "E13": [
+  {
+   "op": "ADD",
+   "field": "open_questions",
+   "value": "Open question: map the twiddle multipliers to a DSP48 cascade (frees LUTs) or retime the ROM output? Leaning DSP48.",
+   "verification": "reported",
+   "confidence": "medium",
+   "evidence_ids": [
+    "E13"
+   ],
+   "rationale": "New evidence raises an open question about implementing twiddle multipliers via DSP48 cascade or retiming ROM output."
+  },
+  {
+   "op": "UPDATE",
+   "target_claim_id": "C21",
+   "field": "next_step",
+   "value": "Re-run implementation with DSP48 mapping on twiddle multipliers.",
+   "verification": "reported",
+   "confidence": "medium",
+   "evidence_ids": [
+    "E13"
+   ],
+   "rationale": "Evidence specifies next step: re-run implementation with DSP48 mapping."
+  }
+ ],
+ "E14": [
+  {
+   "op": "ADD",
+   "field": "value",
+   "key": "hardware_test",
+   "value": "passes on board",
+   "verification": "reported",
+   "confidence": "medium",
+   "evidence_ids": [
+    "E14"
+   ],
+   "rationale": "Human chat reports FFT works on board now, indicating hardware test passes."
+  }
+ ],
+ "E15": [
+  {
+   "op": "UPDATE",
+   "target_claim_id": "C19",
+   "field": "current_status",
+   "value": "Post-synthesis timing passes at 200 MHz (WNS +0.061 ns, 0 failing endpoints); LUT utilization 55% meets goal (<60%).",
+   "verification": "verified",
+   "confidence": "high",
+   "evidence_ids": [
+    "E15"
+   ],
+   "rationale": "Implementation report E15 shows timing success and LUT utilization within goal."
+  },
+  {
+   "op": "INVALIDATE",
+   "target_claim_id": "C20",
+   "field": "current_blocker",
+   "evidence_ids": [
+    "E15"
+   ],
+   "rationale": "Timing blocker cleared; new timing report shows WNS +0.061 ns, 0 failing endpoints."
+  },
+  {
+   "op": "UPDATE",
+   "target_claim_id": "C16",
+   "field": "status_items",
+   "value": "WNS +0.061 ns, 0 failing endpoints at 200 MHz; LUT utilization 55%",
+   "verification": "verified",
+   "confidence": "high",
+   "evidence_ids": [
+    "E15"
+   ],
+   "key": "timing",
+   "rationale": "Update timing status item with latest implementation report results."
+  },
+  {
+   "op": "RESOLVE",
+   "target_contradiction_id": "X2",
+   "value": "Resolved by implementation report E15 showing timing passes at 200 MHz (WNS +0.061 ns, 0 failing endpoints).",
+   "evidence_ids": [
+    "E15"
+   ],
+   "rationale": "New verified evidence confirms timing is met, settling the contradiction."
+  },
+  {
+   "op": "RESOLVE",
+   "target_contradiction_id": "X3",
+   "value": "Resolved by implementation report E15 showing timing passes at 200 MHz (WNS +0.061 ns, 0 failing endpoints).",
+   "evidence_ids": [
+    "E15"
+   ],
+   "rationale": "New verified evidence confirms timing is met, settling the contradiction."
+  }
+ ],
+ "E16": [
+  {
+   "op": "UPDATE",
+   "target_claim_id": "C23",
+   "field": "next_step",
+   "value": "Proper hardware validation on the Arty A7 with ILA probes on the AXI-Stream ports, comparing a UART dump against numpy.",
+   "verification": "reported",
+   "confidence": "medium",
+   "evidence_ids": [
+    "E16"
+   ],
+   "rationale": "Note indicates next step should be proper hardware validation on Arty A7 with ILA probes."
+  }
+ ]
+}

@@ -1,0 +1,6 @@
+.env
+*.db
+__pycache__/
+eval_results/
+.claude/
+site/

@@ -1,0 +1,75 @@
+
+3. Printing statistics.
+
+=== mac ===
+
+   Number of wires:                117
+   Number of wire bits:            184
+   Number of public wires:           6
+   Number of public wire bits:      54
+   Number of memories:               0
+   Number of memory bits:            0
+   Number of processes:              0
+   Number of cells:                151
+     $_ANDNOT_                      33
+     $_AOI3_                         8
+     $_DFF_P_                       20
+     $_NAND_                        18
+     $_NOR_                          1
+     $_NOT_                          7
+     $_OAI3_                        14
+     $_ORNOT_                        3
+     $_OR_                           7
+     $_XNOR_                        19
+     $_XOR_                         20
+     mult8                           1
+
+=== mult8 ===
+
+   Number of wires:                309
+   Number of wire bits:            353
+   Number of public wires:           4
+   Number of public wire bits:      33
+   Number of memories:               0
+   Number of memory bits:            0
+   Number of processes:              0
+   Number of cells:                336
+     $_ANDNOT_                      48
+     $_AND_                         75
+     $_AOI3_                        32
+     $_DFF_P_                       16
+     $_NAND_                        16
+     $_NOR_                          6
+     $_NOT_                          8
+     $_OAI3_                         5
+     $_ORNOT_                        4
+     $_OR_                          15
+     $_XNOR_                        43
+     $_XOR_                         68
+
+=== design hierarchy ===
+
+   mac                               1
+     mult8                           1
+
+   Number of wires:                426
+   Number of wire bits:            537
+   Number of public wires:          10
+   Number of public wire bits:      87
+   Number of memories:               0
+   Number of memory bits:            0
+   Number of processes:              0
+   Number of cells:                486
+     $_ANDNOT_                      81
+     $_AND_                         75
+     $_AOI3_                        40
+     $_DFF_P_                       36
+     $_NAND_                        34
+     $_NOR_                          7
+     $_NOT_                         15
+     $_OAI3_                        19
+     $_ORNOT_                        7
+     $_OR_                          22
+     $_XNOR_                        62
+     $_XOR_                         88
+

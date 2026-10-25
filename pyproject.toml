@@ -1,0 +1,12 @@
+[project]
+name = "statetrace"
+version = "0.1.0"
+description = "Evidence-backed AI project state engine (NVIDIA Nemotron via Nebius Token Factory)"
+requires-python = ">=3.10"
+dependencies = []
+
+[project.scripts]
+statetrace = "statetrace.cli:main"
+
+[tool.setuptools.package-data]
+statetrace = ["static/*.html"]

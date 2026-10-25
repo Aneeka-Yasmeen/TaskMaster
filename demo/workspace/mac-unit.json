@@ -1,0 +1,26 @@
+{
+  "project": "mac-unit",
+  "name": "MAC Unit (Yosys)",
+  "ends_ago_minutes": 200,
+  "_about": "Synthetic showcase project. The notes, commits and logs are written for the demo; the two synthesis reports are real Yosys 0.9 output of the synthetic designs in demo/yosys. mac_v3_hier_stat.rpt is deliberately left out so it can be imported live (review-before-commit).",
+  "events": [
+    {"occurred_at": "2026-10-20T09:00:00", "source": "note", "event_type": "goal",
+     "text": "Goal: 8-bit multiply-accumulate unit for the edge-inference tile. Must pass tb_mac (256 vectors) and stay under 520 generic cells in Yosys synth."},
+    {"occurred_at": "2026-10-20T11:30:00", "source": "git_commit", "ref": "a1c09e2",
+     "text": "commit a1c09e2: mac_v1.v - single-cycle MAC (acc <= acc + a*b), synchronous reset, 16-bit accumulator."},
+    {"occurred_at": "2026-10-20T13:10:00", "source": "sim_log", "ref": "tb_mac-v1",
+     "text": "tb_mac (Icarus) on mac_v1: 256/256 vectors PASS. 0 mismatches."},
+    {"occurred_at": "2026-10-20T15:00:00", "source": "synthesis_report", "synth_report": "mac_v1_stat.rpt", "text": ""},
+    {"occurred_at": "2026-10-21T10:15:00", "source": "note", "event_type": "decision",
+     "text": "Decision: register the product before the adder (one pipeline stage) to shorten the multiply-add path. Costs one cycle of latency and some flip-flops."},
+    {"occurred_at": "2026-10-21T14:40:00", "source": "git_commit", "ref": "7be4410",
+     "text": "commit 7be4410: mac_v2.v - product registered (prod_q), accumulator adds prod_q. One extra cycle of latency."},
+    {"occurred_at": "2026-10-21T16:05:00", "source": "synthesis_report", "synth_report": "mac_v2_stat.rpt", "text": ""},
+    {"occurred_at": "2026-10-22T09:30:00", "source": "sim_log", "ref": "tb_mac-v2",
+     "text": "tb_mac (Icarus) on mac_v2: 250/256 vectors PASS, 6 FAIL. Mismatches all on the first accumulate after reset: expected values assume single-cycle latency."},
+    {"occurred_at": "2026-10-22T11:00:00", "source": "chat",
+     "text": "Sam (chat): the v2 failures are fixed, all 256 vectors pass now."},
+    {"occurred_at": "2026-10-22T12:20:00", "source": "note",
+     "text": "Next: update tb_mac's expected values for the extra cycle of latency and re-run to confirm v2 really passes. Then try the hierarchical version (mac_v3_hier) and compare cell counts against v2."}
+  ]
+}

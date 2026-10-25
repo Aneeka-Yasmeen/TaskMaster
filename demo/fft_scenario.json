@@ -1,0 +1,92 @@
+{
+  "project": "fft-accel",
+  "name": "FFT Accelerator",
+  "description": "Streaming 1024-point FFT accelerator on an Artix-7 FPGA. 16 pieces of evidence over three weeks, including an architecture change, a cleared blocker, a note that contradicts a timing report, a late-arriving outdated note, an unsupported completion claim, and a three-week gap before the engineer returns.",
+  "events": [
+    {"id": "E1", "occurred_at": "2026-08-03T10:00:00", "source": "note", "event_type": "goal",
+     "text": "Goal: 1024-point streaming FFT accelerator with AXI4-Stream in/out on Arty A7-100T. Target clock 200 MHz, must stay under 60% LUTs."},
+    {"id": "E2", "occurred_at": "2026-08-05T16:20:00", "source": "git_commit", "ref": "3f2a91c",
+     "text": "commit 3f2a91c: add radix-2 DIT butterfly, twiddle ROM generator and top-level fft_core.v"},
+    {"id": "E3", "occurred_at": "2026-08-06T11:05:00", "source": "sim_log", "ref": "xsim_tb_fft_core_0806.log",
+     "text": "xsim tb_fft_core: FAILED 9/12 vectors. Output bins 512-1023 mismatch numpy reference; bit-reversed output ordering is not applied."},
+    {"id": "E4", "occurred_at": "2026-08-08T09:30:00", "source": "note", "event_type": "decision",
+     "text": "Decision: dropping the memory-based radix-2 DIT design. Switching to a radix-2^2 single-path delay feedback (R2SDF) pipeline: natural fit for streaming and fewer multipliers. Output reorder buffer handles bit reversal."},
+    {"id": "E5", "occurred_at": "2026-08-12T18:45:00", "source": "git_commit", "ref": "9c41d07",
+     "text": "commit 9c41d07: R2SDF pipeline (10 stages) + output reorder buffer + AXI4-Stream wrapper"},
+    {"id": "E6", "occurred_at": "2026-08-13T14:10:00", "source": "sim_log", "ref": "xsim_tb_axis_fft_0813.log",
+     "text": "xsim tb_axis_fft: 10/12 PASS. FAIL: backpressure_random, backpressure_burst - samples dropped when m_axis_tready deasserts for more than 2 cycles."},
+    {"id": "E7", "occurred_at": "2026-08-15T17:00:00", "source": "sim_log", "ref": "xsim_tb_axis_fft_0815.log",
+     "text": "xsim tb_axis_fft: 12/12 PASS including backpressure_random and backpressure_burst, after adding a skid buffer on the output. Max error vs numpy 2.1e-4."},
+    {"id": "E8", "occurred_at": "2026-08-18T10:30:00", "source": "synthesis_report", "ref": "synth_0818.rpt",
+     "text": "Vivado 2024.2 synth_design complete, 0 errors. Post-synthesis timing @200 MHz: WNS -0.842 ns, 37 failing endpoints. Critical path: stage4 complex multiplier (3 LUT levels + carry chain). Utilization: LUT 52%, FF 31%, DSP48E1 24%."},
+    {"id": "E9", "occurred_at": "2026-08-19T15:00:00", "source": "note", "event_type": "attempt",
+     "text": "Tried: added 2 pipeline register stages inside the complex multiplier of every stage (+2 cycles latency)."},
+    {"id": "E10", "occurred_at": "2026-08-20T09:15:00", "source": "implementation_report", "ref": "route_0820.rpt",
+     "text": "Vivado route_design complete. Timing @200 MHz: WNS -0.118 ns, 4 failing endpoints, all on the stage7 twiddle ROM -> multiplier path. Utilization: LUT 68% (up from 52%), FF 44%, DSP48E1 24%."},
+    {"id": "E11", "occurred_at": "2026-08-20T19:40:00", "source": "note",
+     "text": "Timing is met now, the design is ready for hardware testing."},
+    {"id": "E12", "occurred_at": "2026-08-13T15:00:00", "source": "note",
+     "text": "AXI backpressure is still dropping samples, need to fix tready handling before anything else."},
+    {"id": "E13", "occurred_at": "2026-08-21T11:30:00", "source": "note",
+     "text": "Open question: map the twiddle multipliers to a DSP48 cascade (frees LUTs) or retime the ROM output? Leaning DSP48. Next: re-run implementation with DSP48 mapping."},
+    {"id": "E14", "occurred_at": "2026-08-22T16:00:00", "source": "chat",
+     "text": "fyi the FFT works on the board now"},
+    {"id": "E15", "occurred_at": "2026-08-25T14:00:00", "source": "implementation_report", "ref": "route_0825.rpt",
+     "text": "route_design complete with twiddle multipliers mapped to DSP48E1 (USE_DSP=yes, cascaded). Timing @200 MHz: WNS +0.061 ns, 0 failing endpoints. Utilization: LUT 55%, FF 41%, DSP48E1 38%. write_bitstream complete."},
+    {"id": "E16", "occurred_at": "2026-08-25T18:10:00", "source": "note",
+     "text": "Next: proper hardware validation on the Arty A7 with ILA probes on the AXI-Stream ports, comparing a UART dump against numpy. Friday's board run was only a quick smoke test without reference comparison."}
+  ],
+  "checkpoints": [
+    {"after": "E3", "label": "first simulation failure", "checks": [
+      {"category": "accuracy", "type": "field", "field": "current_blocker", "any": ["bit-revers", "bit revers", "mismatch", "ordering", "fail"]},
+      {"category": "attribution", "type": "field", "field": "current_blocker", "evidence": "E3"},
+      {"category": "accuracy", "type": "item", "match": ["sim", "test"], "any": ["fail", "9/12", "mismatch"], "verification": "verified", "evidence": "E3"}
+    ]},
+    {"after": "E6", "label": "AXI backpressure failure", "checks": [
+      {"category": "accuracy", "type": "field", "field": "current_blocker", "any": ["backpressure", "tready", "drop"]},
+      {"category": "attribution", "type": "field", "field": "current_blocker", "evidence": "E6"},
+      {"category": "staleness", "type": "field", "field": "current_blocker", "none": ["bit-revers", "bit revers", "9/12"]},
+      {"category": "accuracy", "type": "field", "field": "decisions", "any": ["sdf", "r2", "radix-2^2", "delay feedback"]},
+      {"category": "attribution", "type": "field", "field": "decisions", "match": ["sdf", "delay feedback"], "evidence": "E4"}
+    ]},
+    {"after": "E7", "label": "AXI blocker cleared", "checks": [
+      {"category": "staleness", "type": "field", "field": "current_blocker", "none": ["backpressure", "tready", "drop"]},
+      {"category": "accuracy", "type": "item", "match": ["sim", "axi", "test", "backpressure"], "any": ["12/12", "pass"], "verification": "verified", "evidence": "E7"},
+      {"category": "staleness", "type": "item", "match": ["sim", "axi", "test", "backpressure"], "none": ["dropped", "10/12", "9/12"]}
+    ]},
+    {"after": "E10", "label": "pipelining improved timing, LUTs up", "checks": [
+      {"category": "accuracy", "type": "field", "field": "current_blocker", "any": ["timing", "wns", "slack", "-0.118", "failing endpoint"]},
+      {"category": "attribution", "type": "field", "field": "current_blocker", "evidence": "E10"},
+      {"category": "staleness", "type": "field", "field": "current_blocker", "none": ["-0.842", "37 failing"]},
+      {"category": "accuracy", "type": "item", "match": ["timing", "wns"], "any": ["-0.118"], "verification": "verified", "evidence": "E10"},
+      {"category": "staleness", "type": "item", "match": ["timing", "wns"], "none": ["-0.842"]},
+      {"category": "accuracy", "type": "anywhere", "any": ["68%", "68 %"], "evidence": "E10"},
+      {"category": "accuracy", "type": "field", "field": "attempts", "any": ["pipelin", "register stage"]}
+    ]},
+    {"after": "E12", "label": "contradicting note + late-arriving outdated note", "checks": [
+      {"category": "contradiction", "type": "contradiction", "involves": "E11", "status": "open"},
+      {"category": "accuracy", "type": "item", "match": ["timing", "wns"], "any": ["-0.118"], "verification": "verified"},
+      {"category": "hallucination", "type": "item_not_verified", "match": ["timing", "wns"], "words": ["met", "closed"], "exclude": ["not met", "unmet"]},
+      {"category": "staleness", "type": "field", "field": "current_blocker", "none": ["backpressure", "tready", "drop"]},
+      {"category": "staleness", "type": "item", "match": ["axi", "backpressure", "sim", "test"], "none": ["dropping", "still"]}
+    ]},
+    {"after": "E14", "label": "unsupported completion claim", "checks": [
+      {"category": "hallucination", "type": "item_not_verified", "match": ["hardware", "board"], "words": ["work", "pass", "done", "complete", "validated"]},
+      {"category": "hallucination", "type": "field_not_verified", "field": "current_status", "words": ["works on", "hardware validated", "board"]},
+      {"category": "accuracy", "type": "field", "field": "next_step", "any": ["dsp"]},
+      {"category": "accuracy", "type": "field", "field": "open_questions", "any": ["dsp", "retim"]},
+      {"category": "contradiction", "type": "contradiction", "involves": "E11", "status": "open"}
+    ]},
+    {"after": "E16", "label": "timing closed; engineer returns after 3 weeks", "now": "2026-09-15T09:00:00", "checks": [
+      {"category": "staleness", "type": "field", "field": "current_blocker", "none": ["-0.118", "-0.842", "failing endpoint", "wns -", "backpressure"]},
+      {"category": "accuracy", "type": "item", "match": ["timing", "wns"], "any": ["+0.061", "0.061", "met", "0 failing"], "verification": "verified", "evidence": "E15"},
+      {"category": "staleness", "type": "item", "match": ["timing", "wns"], "none": ["-0.118", "-0.842"]},
+      {"category": "accuracy", "type": "anywhere", "any": ["55%", "55 %"], "evidence": "E15"},
+      {"category": "contradiction", "type": "contradiction", "involves": "E11", "status": "resolved"},
+      {"category": "accuracy", "type": "field", "field": "next_step", "any": ["ila", "hardware", "board", "uart"]},
+      {"category": "attribution", "type": "field", "field": "next_step", "evidence": "E16"},
+      {"category": "hallucination", "type": "item_not_verified", "match": ["hardware", "board"], "words": ["work", "pass", "done", "complete", "validated"]},
+      {"category": "recovery", "type": "answer", "groups": [["timing", "wns", "0.061"], ["ila", "hardware validation", "uart"], ["55%"]]}
+    ]}
+  ]
+}

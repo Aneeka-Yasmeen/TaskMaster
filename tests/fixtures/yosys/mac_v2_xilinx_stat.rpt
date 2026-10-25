@@ -1,0 +1,24 @@
+
+3. Printing statistics.
+
+=== mac ===
+
+   Number of wires:                217
+   Number of wire bits:            333
+   Number of public wires:           6
+   Number of public wire bits:      54
+   Number of memories:               0
+   Number of memory bits:            0
+   Number of processes:              0
+   Number of cells:                313
+     FDRE                           36
+     LUT2                           80
+     LUT3                            2
+     LUT4                           15
+     LUT5                            5
+     LUT6                           81
+     MUXCY                          34
+     MUXF7                          23
+     MUXF8                           1
+     XORCY                          36
+

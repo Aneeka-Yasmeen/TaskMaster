@@ -1,0 +1,96 @@
+{
+  "_about": "Hand-written operations for the FFT scenario, used by `--offline` so the UI and tests run without an API key. NOT model output. E12 and E14 deliberately contain wrong proposals (a stale blocker, a 'verified' chat claim) to show the validator rejecting/downgrading them.",
+  "E1": [
+    {"op": "ADD", "field": "goal", "value": "1024-point streaming FFT accelerator with AXI4-Stream I/O on Arty A7-100T at 200 MHz, under 60% LUTs", "verification": "reported", "confidence": "high", "evidence_ids": ["E1"], "rationale": "goal stated by engineer"},
+    {"op": "ADD", "field": "current_status", "value": "Project defined; nothing implemented yet", "verification": "reported", "confidence": "medium", "evidence_ids": ["E1"], "rationale": "start of project"}
+  ],
+  "E2": [
+    {"op": "ADD", "field": "last_action", "value": "Implemented radix-2 DIT butterfly, twiddle ROM generator and fft_core.v (commit 3f2a91c)", "verification": "verified", "confidence": "high", "evidence_ids": ["E2"], "rationale": "commit"},
+    {"op": "ADD", "field": "status_items", "key": "implementation", "value": "Radix-2 DIT core implemented (fft_core.v)", "verification": "verified", "confidence": "high", "evidence_ids": ["E2"], "rationale": "commit"},
+    {"op": "UPDATE", "field": "current_status", "value": "Radix-2 DIT core implemented, not yet simulated", "verification": "verified", "confidence": "high", "evidence_ids": ["E2"], "rationale": "commit"}
+  ],
+  "E3": [
+    {"op": "ADD", "field": "status_items", "key": "functional_simulation", "value": "FAILED 9/12 vectors: bins 512-1023 mismatch numpy, bit-reversed output ordering not applied", "verification": "verified", "confidence": "high", "evidence_ids": ["E3"], "rationale": "sim log"},
+    {"op": "ADD", "field": "current_blocker", "value": "Functional simulation fails: bit-reversed output ordering not applied (bins 512-1023 mismatch)", "verification": "verified", "confidence": "high", "evidence_ids": ["E3"], "rationale": "sim log"},
+    {"op": "UPDATE", "field": "current_status", "value": "Radix-2 DIT core fails functional simulation (9/12 vectors)", "verification": "verified", "confidence": "high", "evidence_ids": ["E3"], "rationale": "sim log"},
+    {"op": "UPDATE", "field": "last_action", "value": "Ran functional simulation tb_fft_core", "verification": "verified", "confidence": "high", "evidence_ids": ["E3"], "rationale": "sim log"}
+  ],
+  "E4": [
+    {"op": "ADD", "field": "decisions", "value": "Switch from memory-based radix-2 DIT to a radix-2^2 single-path delay feedback (R2SDF) pipeline with an output reorder buffer", "verification": "reported", "confidence": "high", "evidence_ids": ["E4"], "rationale": "decision note"},
+    {"op": "ADD", "field": "attempts", "value": "Memory-based radix-2 DIT design: abandoned after simulation failure (bit-reversal ordering)", "verification": "reported", "confidence": "high", "evidence_ids": ["E2", "E3", "E4"], "rationale": "approach dropped"},
+    {"op": "INVALIDATE", "field": "current_blocker", "evidence_ids": ["E4"], "rationale": "radix-2 DIT design abandoned; the new architecture's reorder buffer handles bit reversal"},
+    {"op": "ADD", "field": "next_step", "value": "Implement the R2SDF pipeline with output reorder buffer", "verification": "reported", "confidence": "medium", "evidence_ids": ["E4"], "rationale": "follows from decision"},
+    {"op": "UPDATE", "field": "current_status", "value": "Re-architecting to an R2SDF pipeline", "verification": "reported", "confidence": "medium", "evidence_ids": ["E4"], "rationale": "decision note"}
+  ],
+  "E5": [
+    {"op": "UPDATE", "field": "status_items", "key": "implementation", "value": "R2SDF pipeline (10 stages) + output reorder buffer + AXI4-Stream wrapper implemented (commit 9c41d07)", "verification": "verified", "confidence": "high", "evidence_ids": ["E5"], "rationale": "commit"},
+    {"op": "UPDATE", "field": "last_action", "value": "Implemented R2SDF pipeline, reorder buffer and AXI4-Stream wrapper (commit 9c41d07)", "verification": "verified", "confidence": "high", "evidence_ids": ["E5"], "rationale": "commit"},
+    {"op": "UPDATE", "field": "current_status", "value": "R2SDF design implemented, awaiting simulation", "verification": "verified", "confidence": "high", "evidence_ids": ["E5"], "rationale": "commit"},
+    {"op": "INVALIDATE", "field": "next_step", "evidence_ids": ["E5"], "rationale": "done in commit 9c41d07"}
+  ],
+  "E6": [
+    {"op": "UPDATE", "field": "status_items", "key": "functional_simulation", "value": "tb_axis_fft 10/12 pass; both backpressure tests fail", "verification": "verified", "confidence": "high", "evidence_ids": ["E6"], "rationale": "sim log"},
+    {"op": "ADD", "field": "status_items", "key": "axi_interface", "value": "FAIL: samples dropped when m_axis_tready deasserts > 2 cycles (backpressure_random, backpressure_burst)", "verification": "verified", "confidence": "high", "evidence_ids": ["E6"], "rationale": "sim log"},
+    {"op": "ADD", "field": "current_blocker", "value": "AXI-Stream backpressure: samples dropped when m_axis_tready deasserts for more than 2 cycles", "verification": "verified", "confidence": "high", "evidence_ids": ["E6"], "rationale": "sim log"},
+    {"op": "UPDATE", "field": "last_action", "value": "Simulated the R2SDF design with tb_axis_fft", "verification": "verified", "confidence": "high", "evidence_ids": ["E6"], "rationale": "sim log"},
+    {"op": "UPDATE", "field": "current_status", "value": "R2SDF core correct except AXI backpressure handling", "verification": "verified", "confidence": "high", "evidence_ids": ["E6"], "rationale": "sim log"}
+  ],
+  "E7": [
+    {"op": "UPDATE", "field": "status_items", "key": "functional_simulation", "value": "tb_axis_fft 12/12 PASS, max error vs numpy 2.1e-4", "verification": "verified", "confidence": "high", "evidence_ids": ["E7"], "rationale": "sim log"},
+    {"op": "UPDATE", "field": "status_items", "key": "axi_interface", "value": "PASS: backpressure_random and backpressure_burst pass after output skid buffer", "verification": "verified", "confidence": "high", "evidence_ids": ["E7"], "rationale": "sim log"},
+    {"op": "INVALIDATE", "field": "current_blocker", "evidence_ids": ["E7"], "rationale": "backpressure tests pass after the skid buffer"},
+    {"op": "ADD", "field": "attempts", "value": "Added an output skid buffer to fix AXI backpressure: worked (12/12 pass)", "verification": "verified", "confidence": "high", "evidence_ids": ["E7"], "rationale": "fix and outcome"},
+    {"op": "UPDATE", "field": "last_action", "value": "Fixed AXI backpressure with an output skid buffer; all 12 simulation tests pass", "verification": "verified", "confidence": "high", "evidence_ids": ["E7"], "rationale": "sim log"},
+    {"op": "UPDATE", "field": "current_status", "value": "Functionally correct in simulation; synthesis next", "verification": "verified", "confidence": "high", "evidence_ids": ["E7"], "rationale": "sim log"}
+  ],
+  "E8": [
+    {"op": "ADD", "field": "status_items", "key": "synthesis", "value": "synth_design complete, 0 errors (Vivado 2024.2)", "verification": "verified", "confidence": "high", "evidence_ids": ["E8"], "rationale": "synthesis report"},
+    {"op": "ADD", "field": "status_items", "key": "timing", "value": "Post-synthesis @200 MHz: WNS -0.842 ns, 37 failing endpoints; critical path stage4 complex multiplier", "verification": "verified", "confidence": "high", "evidence_ids": ["E8"], "rationale": "synthesis report"},
+    {"op": "ADD", "field": "status_items", "key": "resource_utilization", "value": "LUT 52%, FF 31%, DSP48E1 24%", "verification": "verified", "confidence": "high", "evidence_ids": ["E8"], "rationale": "synthesis report"},
+    {"op": "ADD", "field": "current_blocker", "value": "Timing fails at 200 MHz: WNS -0.842 ns, critical path in the stage4 complex multiplier", "verification": "verified", "confidence": "high", "evidence_ids": ["E8"], "rationale": "synthesis report"},
+    {"op": "UPDATE", "field": "last_action", "value": "Synthesized the design in Vivado 2024.2", "verification": "verified", "confidence": "high", "evidence_ids": ["E8"], "rationale": "synthesis report"},
+    {"op": "UPDATE", "field": "current_status", "value": "Synthesizes cleanly but misses timing at 200 MHz", "verification": "verified", "confidence": "high", "evidence_ids": ["E8"], "rationale": "synthesis report"}
+  ],
+  "E9": [
+    {"op": "ADD", "field": "attempts", "value": "Added 2 pipeline register stages inside each stage's complex multiplier (+2 cycles latency)", "verification": "reported", "confidence": "medium", "evidence_ids": ["E9"], "rationale": "engineer note"},
+    {"op": "UPDATE", "field": "last_action", "value": "Pipelined the complex multipliers (+2 register stages)", "verification": "reported", "confidence": "medium", "evidence_ids": ["E9"], "rationale": "engineer note"}
+  ],
+  "E10": [
+    {"op": "UPDATE", "field": "status_items", "key": "timing", "value": "Post-route @200 MHz: WNS -0.118 ns, 4 failing endpoints on the stage7 twiddle ROM -> multiplier path", "verification": "verified", "confidence": "high", "evidence_ids": ["E10"], "rationale": "implementation report"},
+    {"op": "UPDATE", "field": "status_items", "key": "resource_utilization", "value": "LUT 68% (up from 52%, over the 60% budget), FF 44%, DSP48E1 24%", "verification": "verified", "confidence": "high", "evidence_ids": ["E10"], "rationale": "implementation report"},
+    {"op": "UPDATE", "field": "current_blocker", "value": "Timing still fails at 200 MHz (WNS -0.118 ns on stage7 twiddle ROM -> multiplier) and LUT 68% exceeds the 60% budget", "verification": "verified", "confidence": "high", "evidence_ids": ["E10"], "rationale": "implementation report"},
+    {"op": "UPDATE", "target_claim_id": "C33", "field": "attempts", "value": "Pipelined complex multipliers (+2 register stages): WNS improved -0.842 -> -0.118 ns, but LUT rose 52% -> 68%", "verification": "verified", "confidence": "high", "evidence_ids": ["E9", "E10"], "rationale": "outcome of the pipelining attempt"},
+    {"op": "UPDATE", "field": "last_action", "value": "Ran place & route after pipelining", "verification": "verified", "confidence": "high", "evidence_ids": ["E10"], "rationale": "implementation report"},
+    {"op": "UPDATE", "field": "current_status", "value": "Routed; timing close (-0.118 ns) but not met, LUT over budget", "verification": "verified", "confidence": "high", "evidence_ids": ["E10"], "rationale": "implementation report"}
+  ],
+  "E11": [
+    {"op": "CONTRADICT", "field": "status_items", "key": "timing", "value": "Note says timing is met, but implementation report route_0820 shows WNS -0.118 ns with 4 failing endpoints", "evidence_ids": ["E11"], "rationale": "human report conflicts with a verified artifact"}
+  ],
+  "E12": [
+    {"op": "UPDATE", "field": "current_blocker", "value": "AXI backpressure still dropping samples", "verification": "reported", "confidence": "medium", "evidence_ids": ["E12"], "rationale": "deliberately wrong proposal: should be rejected as stale"},
+    {"op": "UPDATE", "field": "status_items", "key": "axi_interface", "value": "FAIL: still dropping samples on backpressure", "verification": "reported", "confidence": "medium", "evidence_ids": ["E12"], "rationale": "deliberately wrong proposal: should be rejected as stale"}
+  ],
+  "E13": [
+    {"op": "ADD", "field": "open_questions", "value": "Map the twiddle multipliers to a DSP48 cascade (frees LUTs) or retime the ROM output? Leaning DSP48", "verification": "reported", "confidence": "medium", "evidence_ids": ["E13"], "rationale": "engineer note"},
+    {"op": "ADD", "field": "next_step", "value": "Re-run implementation with the twiddle multipliers mapped to DSP48", "verification": "reported", "confidence": "medium", "evidence_ids": ["E13"], "rationale": "engineer note"}
+  ],
+  "E14": [
+    {"op": "ADD", "field": "status_items", "key": "hardware_test", "value": "FFT works on the board (chat message)", "verification": "verified", "confidence": "high", "evidence_ids": ["E14"], "rationale": "deliberately over-claimed: should be downgraded to reported"}
+  ],
+  "E15": [
+    {"op": "UPDATE", "field": "status_items", "key": "timing", "value": "Post-route @200 MHz: WNS +0.061 ns, 0 failing endpoints - timing met with DSP48 cascade mapping", "verification": "verified", "confidence": "high", "evidence_ids": ["E15"], "rationale": "implementation report"},
+    {"op": "UPDATE", "field": "status_items", "key": "resource_utilization", "value": "LUT 55%, FF 41%, DSP48E1 38% - within the 60% LUT budget", "verification": "verified", "confidence": "high", "evidence_ids": ["E15"], "rationale": "implementation report"},
+    {"op": "INVALIDATE", "field": "current_blocker", "evidence_ids": ["E15"], "rationale": "timing met (WNS +0.061 ns) and LUT 55% within budget"},
+    {"op": "ADD", "field": "status_items", "key": "bitstream", "value": "write_bitstream complete", "verification": "verified", "confidence": "high", "evidence_ids": ["E15"], "rationale": "implementation report"},
+    {"op": "ADD", "field": "attempts", "value": "Mapped twiddle multipliers to cascaded DSP48E1: timing met (+0.061 ns), LUT down to 55%", "verification": "verified", "confidence": "high", "evidence_ids": ["E15"], "rationale": "outcome"},
+    {"op": "INVALIDATE", "target_claim_id": "C41", "field": "open_questions", "evidence_ids": ["E15"], "rationale": "answered: DSP48 mapping closed timing"},
+    {"op": "RESOLVE", "target_contradiction_id": "X1", "value": "Timing is now met per route_0825 (WNS +0.061 ns). On 2026-08-20 it was not (-0.118 ns), so the E11 note was premature.", "evidence_ids": ["E15"], "rationale": "artifact settles it"},
+    {"op": "UPDATE", "field": "last_action", "value": "Re-implemented with DSP48 cascade mapping and generated the bitstream", "verification": "verified", "confidence": "high", "evidence_ids": ["E15"], "rationale": "implementation report"},
+    {"op": "UPDATE", "field": "current_status", "value": "Timing closed at 200 MHz, bitstream generated; hardware not yet validated against a reference", "verification": "verified", "confidence": "high", "evidence_ids": ["E15"], "rationale": "implementation report"},
+    {"op": "INVALIDATE", "field": "next_step", "evidence_ids": ["E15"], "rationale": "done"}
+  ],
+  "E16": [
+    {"op": "ADD", "field": "next_step", "value": "Hardware validation on the Arty A7: ILA probes on the AXI-Stream ports, compare a UART dump against numpy", "verification": "reported", "confidence": "medium", "evidence_ids": ["E16"], "rationale": "engineer note"},
+    {"op": "UPDATE", "field": "status_items", "key": "hardware_test", "value": "Only a quick smoke test on the board, no reference comparison yet", "verification": "reported", "confidence": "medium", "evidence_ids": ["E14", "E16"], "rationale": "E16 clarifies the E14 chat message"}
+  ]
+}

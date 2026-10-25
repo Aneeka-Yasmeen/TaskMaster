@@ -1,0 +1,38 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>TaskMaster Companion</title>
+<link rel="icon" href="img/logo.svg" type="image/svg+xml">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="css/app.css">
+<script>
+  try { const t = localStorage.getItem("tm.theme"); if (t) document.documentElement.dataset.theme = t; } catch {}
+</script>
+<!--TM_MODE-->
+</head>
+<body class="companion">
+<header class="c-head">
+  <span class="logo" aria-hidden="true"></span>
+  <label class="sr" for="c-project">Project</label>
+  <select id="c-project" class="c-select" aria-label="Project"></select>
+  <span class="c-status" id="c-status" role="status"></span>
+  <button class="icon-btn" id="c-dash" title="Open the full dashboard" aria-label="Open the full dashboard"></button>
+</header>
+<main id="c-main" tabindex="-1" aria-live="polite"></main>
+<footer class="c-foot" id="c-foot"></footer>
+<div class="sheet-wrap" id="sheet-wrap" hidden>
+  <div class="sheet-scrim" data-action="close-sheet"></div>
+  <section class="sheet" id="sheet" role="dialog" aria-modal="true" aria-labelledby="sheet-title"></section>
+</div>
+<div class="drawer-wrap" id="drawer-wrap" hidden>
+  <div class="sheet-scrim" data-action="close-drawer"></div>
+  <aside class="drawer" id="drawer" role="dialog" aria-modal="true" aria-labelledby="drawer-title"></aside>
+</div>
+<div class="toasts" id="toasts" role="status" aria-live="polite"></div>
+<script type="module" src="js/companion.js"></script>
+</body>
+</html>

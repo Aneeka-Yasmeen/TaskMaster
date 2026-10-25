@@ -1,0 +1,23 @@
+{
+  "project": "floorset",
+  "name": "FloorSet",
+  "ends_ago_minutes": 2950,
+  "events": [
+    {"occurred_at": "2026-09-14T10:00:00", "source": "note", "event_type": "goal",
+     "text": "Goal: GNN-based floorplanning on the FloorSet-Lite benchmark. Beat the simulated-annealing baseline on HPWL by at least 5% with zero overlap violations."},
+    {"occurred_at": "2026-09-16T19:20:00", "source": "experiment_log", "ref": "exp-031",
+     "text": "exp-031: SA baseline on FloorSet-Lite (100 designs): normalized HPWL 1.000, overlap violations 0/100, runtime 41 min."},
+    {"occurred_at": "2026-09-19T22:05:00", "source": "experiment_log", "ref": "exp-034",
+     "text": "exp-034: GraphSAGE encoder + RL placer: HPWL 0.970 (-3.0%), overlap violations in 12/100 designs, runtime 6 min. 3 of 5 seeds diverged during training."},
+    {"occurred_at": "2026-09-21T10:30:00", "source": "note", "event_type": "decision",
+     "text": "Decision: drop the RL placer, switch to supervised placement + a Tetris-style legalization pass. Reason: RL training unstable (3/5 seeds diverged) and overlaps. Tradeoff: needs SA solutions as labels."},
+    {"occurred_at": "2026-09-25T20:40:00", "source": "experiment_log", "ref": "exp-041",
+     "text": "exp-041: GAT encoder + supervised placer + legalizer: HPWL 0.955 (-4.5%), overlap 0/100, runtime 9 min, peak GPU memory 22 GB."},
+    {"occurred_at": "2026-09-27T12:00:00", "source": "note", "event_type": "decision",
+     "text": "Decision: revert the encoder from GAT back to GraphSAGE. GAT gave no HPWL gain over GraphSAGE and doubles GPU memory."},
+    {"occurred_at": "2026-09-30T23:10:00", "source": "experiment_log", "ref": "exp-043",
+     "text": "exp-043: GraphSAGE + supervised placer + legalizer: HPWL 0.952 (-4.8%), overlap 0/100, runtime 8 min, peak GPU memory 11 GB."},
+    {"occurred_at": "2026-10-02T11:00:00", "source": "note",
+     "text": "Open question: is the 5% target against SA at its 41-min budget or at equal runtime? Investigating whether net-weight edge features help. Next: run the ablation without the legalizer to measure how much HPWL it costs."}
+  ]
+}

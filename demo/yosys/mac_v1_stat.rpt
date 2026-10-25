@@ -1,0 +1,26 @@
+
+3. Printing statistics.
+
+=== mac ===
+
+   Number of wires:                444
+   Number of wire bits:            496
+   Number of public wires:           5
+   Number of public wire bits:      38
+   Number of memories:               0
+   Number of memory bits:            0
+   Number of processes:              0
+   Number of cells:                478
+     $_ANDNOT_                      90
+     $_AND_                         73
+     $_AOI3_                        43
+     $_DFF_P_                       20
+     $_NAND_                        18
+     $_NOR_                         12
+     $_NOT_                         20
+     $_OAI3_                        12
+     $_ORNOT_                       15
+     $_OR_                          26
+     $_XNOR_                        51
+     $_XOR_                         98
+
