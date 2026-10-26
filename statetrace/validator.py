@@ -253,7 +253,8 @@ def _protect_verified(target, op, new_verification, evidence, events, log, claim
 def _converted_description(event, claim_text, target, reason):
     src = {"git_commit": "Commit", "note": "A note", "chat": "A chat message", "meeting": "A meeting note"}.get(
         event["source"], event["source"].replace("_", " ").capitalize())
-    return (f"{src} ({event['id']}) implies: {claim_text[:160].rstrip(". ")}. But {target['id']} is verified by "
+    implied = claim_text[:160].rstrip(". ")  # outside the f-string: reusing quotes inside needs Python 3.12+
+    return (f"{src} ({event['id']}) implies: {implied}. But {target['id']} is verified by "
             f"{', '.join(target['evidence'])}, and {reason}. Needs a test, simulation or report to settle.")
 
 

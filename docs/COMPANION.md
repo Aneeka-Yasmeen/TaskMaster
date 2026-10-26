@@ -40,7 +40,7 @@ optionally watches your connected Git sources and shows Windows notifications.
 Run on **Windows Python** (not inside WSL): hotkeys and notifications are Windows APIs.
 
 ```bat
-cd C:\Users\Aneeka\TaskMaster
+cd taskmaster
 python -m statetrace --db demo.db companion
 ```
 

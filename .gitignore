@@ -4,3 +4,8 @@ __pycache__/
 eval_results/
 .claude/
 site/
+*.db-journal
+*.db-wal
+*.db-shm
+# submission notes kept locally, not part of the public repo
+DEVPOST.md

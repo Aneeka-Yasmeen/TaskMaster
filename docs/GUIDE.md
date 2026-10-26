@@ -10,8 +10,8 @@ Token Factory) as an assistant that reasons, compares and suggests. **It never a
 
 | What | How |
 |---|---|
-| **Start** (recommended) | Double-click `scripts\TaskMaster-Companion.cmd`, or in PowerShell/cmd: `python -m statetrace --db demo.db companion` |
-| Start without the hotkey helper | `python -m statetrace --db demo.db serve`, then open http://127.0.0.1:8765 |
+| **Start** | `python -m statetrace serve`, then open http://127.0.0.1:8765 |
+| Start with the Windows hotkey helper | Double-click `scripts\TaskMaster-Companion.cmd`, or `python -m statetrace --db demo.db companion` (see [COMPANION.md](COMPANION.md)) |
 | Open the full dashboard | http://127.0.0.1:8765 in any browser, or the ↗ icon / *Open full dashboard* in the compact window |
 | Open the compact window | **Ctrl+Alt+T** from any app (while the companion runs) |
 | **Quit** | **Ctrl+Q** in the dashboard or compact window, **Settings → Quit TaskMaster**, **Quit** in the compact window's footer, or `python -m statetrace stop`, or Ctrl+C / close the console window that started it |
@@ -22,8 +22,8 @@ Token Factory) as an assistant that reasons, compares and suggests. **It never a
   In those cases use Quit or `stop`.
 - Your data is always saved; quitting never loses anything.
 
-Use one database per purpose: `demo.db` for the demo, e.g. `asic.db` for your real ASIC project
-(`--db asic.db`).
+Use one database per purpose, e.g. `--db demo.db` for trying things and `--db asic.db` for your real ASIC project.
+A new database starts empty: click **Load sample project** (no API key needed) or add your first update.
 
 ---
 
