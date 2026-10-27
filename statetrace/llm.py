@@ -1,10 +1,3 @@
-"""Clients for the language model.
-
-NebiusClient talks to Nebius Token Factory's OpenAI-compatible Chat Completions API
-(NVIDIA Nemotron by default). ScriptedLLM replays hand-written operations so the pipeline,
-UI and tests run offline; it is not a model and is labelled as such everywhere it is used.
-"""
-
 import json
 import os
 import re
