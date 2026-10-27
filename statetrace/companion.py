@@ -1,20 +1,3 @@
-"""Desktop companion process: `python -m statetrace companion`.
-
-One Windows-side helper (stdlib only) that:
-  1. connects to a running TaskMaster server on 127.0.0.1:<port>, or hosts one in-process
-     (never a detached duplicate; if the port is taken by something else it stops with an error);
-  2. registers Ctrl+Alt+T (configurable) to open or focus the compact window (an Edge app window);
-  3. when, and only when, Background monitoring is on and not paused: scans *enabled* Git
-     sources through the existing staged-import API (never accepting anything), lets the server
-     generate notices with its existing reminder rules, and, if Windows notifications are on,
-     shows the deliverable ones once each;
-  4. reports a heartbeat so the UI can show whether it is running.
-
-Closing the compact window never stops this process or the server. Ctrl+C (or closing the
-console window) stops the companion; a server it hosts stops with it, and data is unaffected.
-All state logic stays in the server: this module only calls the HTTP API.
-"""
-
 import json
 import os
 import socket
