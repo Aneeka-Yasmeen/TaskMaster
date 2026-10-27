@@ -1,9 +1,3 @@
-"""Desktop companion logic that can be tested without a Windows desktop.
-
-Windows-only behaviour (the real hotkey, window focus, toasts) is covered by the manual checklist
-in docs/COMPANION.md; here the notifier/opener/window finder are injected fakes.
-"""
-
 import os
 import shutil
 import socket
