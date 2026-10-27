@@ -1,12 +1,3 @@
-"""Server-side background worker (runs only in live mode, inside the TaskMaster server process).
-
-1. Offline sync: updates saved while Nemotron was unreachable are applied, oldest first, through
-   the normal engine + validator once Nebius answers again (checked every minute while anything
-   is queued). These are the user's own submitted updates, so this runs regardless of autonomy.
-2. Automatic reviews: after the state changes, Nemotron reviews the project *only if* the
-   Autonomy setting allows that project. Reviews are opinions; they never change the state.
-"""
-
 import threading
 import time
 
