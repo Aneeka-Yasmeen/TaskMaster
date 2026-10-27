@@ -1,11 +1,3 @@
-"""Desktop companion support: opt-in monitoring/notification settings, companion status, the
-compact "brief" shown in the popup, and which notices may become OS notifications.
-
-Everything here reuses existing logic: notices come from reminders.generate_notices (same
-deadline, quiet-hours and dedupe rules), Git scans go through ingest's staged-import workflow,
-and the brief is built from the validated state. Nothing here writes claims or evidence.
-"""
-
 from datetime import datetime
 
 from . import view as V
