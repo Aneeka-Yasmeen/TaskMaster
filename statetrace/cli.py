@@ -1,5 +1,3 @@
-"""Command line interface: python -m statetrace <command> ..."""
-
 import argparse
 import json
 import os
