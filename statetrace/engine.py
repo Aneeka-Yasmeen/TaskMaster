@@ -1,11 +1,3 @@
-"""new_state = StateEngine(old_state, new_evidence)
-
-1. The evidence is appended to the event log (always, even if the model call later fails).
-2. The model sees the current claims plus the new evidence and proposes operations.
-3. The validator applies the operations deterministically and records what it rejected.
-4. The new state is saved as a new version; the transition is logged for audit and diffing.
-"""
-
 import time
 
 from .llm import LLMError
