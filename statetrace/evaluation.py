@@ -1,19 +1,3 @@
-"""Scenario-based evaluation.
-
-Feeds a scripted sequence of evidence through an engine and, at checkpoints, scores the
-reconstructed state against known ground truth. Categories:
-
-  accuracy       does the state say what is actually true?
-  attribution    does the claim cite the right evidence?
-  contradiction  are conflicts surfaced (and later resolved)?
-  staleness      are obsolete beliefs gone from the current state?
-  hallucination  is anything marked verified without supporting artifacts?
-  recovery       does "Where am I?" after a long gap contain the key facts?
-
-Plus global counters: unsupported "verified" claims, invented citations, stale ops rejected,
-latency per update.
-"""
-
 import json
 import os
 import statistics
