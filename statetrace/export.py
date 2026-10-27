@@ -1,9 +1,3 @@
-"""Export a read-only static snapshot of a workspace (frontend + pre-computed JSON).
-
-The output folder can be hosted on any static host (Vercel, GitHub Pages, Netlify). No API key,
-no server, no model calls: the frontend's snapshot service reads the JSON files instead of /api.
-"""
-
 import json
 import os
 import shutil
