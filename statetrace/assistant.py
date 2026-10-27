@@ -1,17 +1,3 @@
-"""TaskMaster's assistant layer: Nemotron thinks, the user decides.
-
-- answer(): questions go to Nemotron FIRST, grounded in the validated state, the evidence log and
-  the stored-state answer. If the model can't be reached, the stored-state answer is returned and
-  labelled as such. Citations in model answers are checked against the evidence log.
-- review(): Nemotron compares the evidence-backed state with the goal and deadlines and says
-  whether the project is moving in the right direction, with concerns and suggestions.
-- Reviews are the model's OPINION. They are stored separately (assistant_reviews), never become
-  claims or evidence, and are never acted on automatically. The user can turn a suggestion into
-  an update or a milestone; that goes through the normal engine + validator.
-- Autonomy (Settings): off | selected projects | all projects. It controls only *automatic*
-  reviews and background monitoring scope. It never allows changing the state on its own.
-"""
-
 import json
 import re
 import time
