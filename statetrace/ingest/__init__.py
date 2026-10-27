@@ -1,14 +1,4 @@
-"""Automatic evidence sources.
-
-Workflow: a source is *scanned* into staged import items (no effect on project state); the
-user reviews them and *accepts* (appended as evidence and run through the state engine) or
-*skips* them. Failed state updates keep their evidence and can be retried. A source may opt
-into auto-accept; it is off by default.
-
-Each source kind implements `validate(config) -> config` and `scan(config, known_ids) -> items`,
-where an item is {external_id, occurred_at, title, text, source, ref, meta}. Adding GitHub, CI or
-test-report sources means adding a module with those two functions to KINDS.
-"""
+"""Automatic evidence sources."""
 
 from ..engine import StateEngine
 from ..store import now_ts
