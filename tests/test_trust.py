@@ -1,9 +1,3 @@
-"""Trust-boundary tests: what the model says is never taken as established on its own.
-
-Covers the catch-up ("Where did I leave off?"), review-before-commit proposals for Yosys imports,
-validator failures, malformed model output, staleness and project isolation. Fake model only.
-"""
-
 import json
 import os
 import shutil
