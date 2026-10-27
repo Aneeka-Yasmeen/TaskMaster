@@ -1,9 +1,3 @@
-"""Yosys synthesis skill: parsing, comparison, constraints, provenance, Nemotron explanation.
-
-Real fixtures: tests/fixtures/yosys/*.rpt (real Yosys 0.9 output of synthetic designs, see PROVENANCE.md).
-Synthetic fixtures: built below and labelled SYNTHETIC.
-"""
-
 import json
 import os
 import shutil
