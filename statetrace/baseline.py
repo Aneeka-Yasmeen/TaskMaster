@@ -1,8 +1,3 @@
-"""Ablation baseline: the same model and the same rules, but it rewrites the whole state on every
-event (the usual "keep a running summary" approach). No operations, no validator, no claim
-history. Used only by the evaluation to measure what the controlled transition adds.
-"""
-
 import json
 import time
 
