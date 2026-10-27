@@ -1,11 +1,3 @@
-"""Regression tests built from failures actually observed in live Nemotron runs.
-
-`fixtures/live_run_nemotron.json` holds the operations Nemotron proposed in the first live run
-(extracted read-only from live.db). Replaying them through the current validator pins down how
-each observed failure is now handled. These tests check the validator and the evaluator, not
-model quality: the recorded output is fixed.
-"""
-
 import json
 import os
 import unittest
