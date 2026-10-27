@@ -1,9 +1,3 @@
-"""Transport-independent API used by the HTTP server and by the static snapshot export.
-
-Each public method returns plain JSON-serialisable data. Errors are raised as ApiError with a
-human-readable message (the UI shows it as-is; no stack traces reach the browser).
-"""
-
 import os
 
 from . import assistant, ingest, monitoring, proposals, reminders, synthesis
