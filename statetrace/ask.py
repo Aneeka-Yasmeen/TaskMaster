@@ -1,13 +1,3 @@
-"""Question answering.
-
-The core questions are answered deterministically from the validated state. Other questions go
-to the model with the state and evidence as context; citations in its answer are then checked
-against the evidence store and invented ones are flagged.
-
-Answers are returned as structured data (headline, text, cited evidence, suggested next step) so
-the UI can show the reasoning next to the evidence instead of as a chat bubble.
-"""
-
 import re
 
 from . import view as V
