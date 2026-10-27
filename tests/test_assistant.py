@@ -1,5 +1,3 @@
-"""Assistant layer, autonomy, offline queue + sync, priority, shutdown. Fake model clients only."""
-
 import json
 import os
 import shutil
