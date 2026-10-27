@@ -1,9 +1,3 @@
-"""Read model: turn a state into what the engineer sees, and compare state versions.
-
-Answers to the fixed questions are rendered deterministically from validated claims, so every
-sentence carries citations the validator already checked. Nothing here is generated text.
-"""
-
 from datetime import datetime
 
 from .schema import FIELD_LABELS, KEYED_FIELDS, LIST_FIELDS, SCALAR_FIELDS
