@@ -1,5 +1,3 @@
-"""HTTP-level tests: cross-site protection, read-only mode, project isolation, new routes."""
-
 import json
 import os
 import tempfile
