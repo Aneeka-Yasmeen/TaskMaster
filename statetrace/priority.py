@@ -1,12 +1,4 @@
-"""Which project needs attention first: a deterministic score with stated reasons.
-
-Score (higher = more urgent):
-  overdue milestone 100 · due within 3 days 80 · within 7 days 60 · within 14 days 30
-  + you marked the project High priority 40 (Low: -30)
-  + active blocker 20 · unresolved contradiction 15 · updates waiting to sync 10
-  + stale (7+ days without evidence) 10 · commits waiting for review 5
-  + Nemotron's latest review says off track / blocked 15 (at risk 8)
-"""
+"""Which project needs attention first: a deterministic score with stated reasons."""
 
 from datetime import datetime, timedelta
 
