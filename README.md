@@ -1,31 +1,53 @@
 # TaskMaster
 
-**Where did I leave my project?** TaskMaster keeps an evidence log for each engineering project (notes, sim logs,
-Yosys reports, commits) and reconstructs what is currently true: the blocker, the next step, what is verified, what
-is only reported, and what conflicts. Every statement links to the evidence behind it.
+**Pick up any engineering project exactly where you left it.**
 
-It uses **NVIDIA Nemotron** through **Nebius Token Factory** to propose state changes and to explain them. A
-deterministic validator decides what is applied, so the model can't mark anything as verified on its own.
+Long projects leave their history everywhere: notes, simulation logs, synthesis reports, commits and chat messages.
+After a few days away, it's hard to remember what was done, what is blocking you, and what comes next.
 
-## Features
+TaskMaster keeps all of that evidence in one place for each project and turns it into a clear, up-to-date summary:
 
-- **"Where you left off & what to do next"** on every project: the next action, blockers, verified facts,
-  uncertain items and open contradictions, each with its evidence.
-- **Verified vs. reported:** only artifacts (logs, tests, reports) can verify a claim. Notes and chats stay "reported".
-  Conflicting evidence is flagged instead of silently overwritten.
-- **History:** every update shows exactly what it changed; earlier states can be viewed at any time.
-- **Yosys synthesis reports:** import `stat` reports, compare runs, and review a proposed state change before it is applied.
-- **Git commits, milestones and reminders**, plus a Windows desktop companion (optional).
-- **Works without an API key** for exploring a sample project; Nemotron features need a Nebius key.
+- **where you left off** and **what to do next**;
+- what is **verified** (backed by a log, test or report) and what is only **reported** by someone;
+- what **conflicts**, so you can settle it instead of guessing.
 
-## Requirements
+Every statement links back to the evidence it came from, so you can always check why TaskMaster believes something.
 
-- Python 3.10 or newer (tested on Windows with 3.10, 3.12 and 3.13). No packages to install.
-- A web browser.
-- Optional: a Nebius Token Factory API key for live Nemotron features; `git` for importing commits; Windows for the
-  desktop companion.
+## How it works
 
-## Quick start (no API key needed)
+1. **You add evidence** as you work: paste a note, a log or a report, import a Yosys synthesis report, or pull in Git
+   commits.
+2. **NVIDIA Nemotron reads it** (through Nebius Token Factory) and suggests how the project's status should change.
+3. **TaskMaster checks the suggestion** against clear rules before saving it. For example, only a real log or report can
+   mark something as verified, and a chat message can't overrule a test result.
+4. **You see the result**: an updated project summary, what changed, and the evidence behind each point.
+
+Nothing is ever deleted, so you can look back at how a project got to where it is.
+
+## What you can do
+
+- See **"Where you left off & what to do next"** at the top of every project.
+- Open any piece of evidence or ask **"Why?"** about any statement.
+- Ask questions in plain English, such as *"What have I already tried?"*
+- Get a **project review** from Nemotron: on track, at risk or blocked, with suggestions.
+- Import **Yosys synthesis reports**, compare runs, and approve each proposed change before it's applied.
+- Review **Git commits** before they count as evidence.
+- Set **milestones** and get reminders. Today's page shows which project needs you first, and why.
+- On Windows, open a compact TaskMaster window from any app with **Ctrl+Alt+T**.
+
+## Works with your tools
+
+**Today:** TaskMaster has built-in support for **Yosys** synthesis reports and **Git** commits. Text output from any
+other tool, such as a simulator log, a timing or implementation report, or test results, can be pasted in as evidence
+with **Add update**. TaskMaster then treats it like any other log or report.
+
+**In the works:** direct integrations with more engineering software, including **CAD**, **ECAD** (PCB and chip
+design) and **proprietary EDA tools**. The goal is to read their reports automatically, the way Yosys reports are
+read today.
+
+## Get started
+
+You need **Python 3.10 or newer** and a web browser. There's nothing else to install.
 
 ```bash
 git clone https://github.com/Aneeka-Yasmeen/taskmaster.git
@@ -33,78 +55,79 @@ cd taskmaster
 python -m statetrace serve
 ```
 
-Open **http://127.0.0.1:8765**. (On Windows, use `py` if `python` isn't found; on macOS/Linux you may need `python3`.)
+Then open **http://127.0.0.1:8765** in your browser.
 
-Your data is stored in `statetrace.db` in the same folder. To stop TaskMaster, press **Ctrl+C** in that terminal, or
-run `python -m statetrace stop` from another terminal.
+> On Windows, use `py` instead of `python` if the command isn't found. On macOS or Linux, you may need `python3`.
 
-### Explore the sample project
+### Try the sample project (no API key needed)
 
 1. On the start page, click **Load sample project**.
-2. *FFT Accelerator* opens. It is synthetic data, marked **Sample data**, built from recorded operations (not a live
-   model run).
-3. Read the **Where you left off** card. Each item has a label (**Verified**, **Reported**, **Contested**) and
-   evidence chips such as **E16**. Click a chip to read the evidence, or **Why?** to see why a claim is believed.
-4. Press **D** for the detailed view: the full state, history, decisions and questions. Click any event to see what it
-   changed.
-5. Open **Synthesis (Yosys)** and import `demo/yosys/mac_v1_stat.rpt`, then `demo/yosys/mac_v2_stat.rpt`, and
-   **Compare** them. Without a key, reports are saved as evidence and compared, but the project state isn't updated.
+2. The *FFT Accelerator* project opens. It's an example project, marked **Sample data**.
+3. At the top, the **Where you left off** card shows the next action and the project's status. Each point is labelled
+   **Verified**, **Reported** or **Contested**. Click an evidence chip such as **E16** to read the source.
+4. Press **D** to see the full history. Click any event to see exactly what it changed.
+5. Open **Synthesis (Yosys)** in the sidebar, import `demo/yosys/mac_v1_stat.rpt` and then `mac_v2_stat.rpt`, and
+   click **Compare**.
 
-## Live Nemotron features (Nebius Token Factory)
+To stop TaskMaster, press **Ctrl+Q** in the app or **Ctrl+C** in the terminal. Your work is saved automatically in
+`statetrace.db` in the same folder.
 
-1. Get an API key from [Nebius Token Factory](https://tokenfactory.nebius.com/).
-2. Create your settings file and put the key in it:
+## Turn on Nemotron
+
+The AI features use NVIDIA Nemotron through Nebius Token Factory.
+
+1. Create an API key at [Nebius Token Factory](https://tokenfactory.nebius.com/).
+2. Copy the settings template and add your key:
 
    ```bash
    copy .env.example .env        # Windows
-   cp .env.example .env          # macOS/Linux
+   cp .env.example .env          # macOS / Linux
    ```
 
-   Edit `.env` and set `NEBIUS_API_KEY=...`. The model defaults to `nvidia/nemotron-3-super-120b-a12b`.
-3. Check the key (this lists the models your key can use):
+   Open `.env` and set `NEBIUS_API_KEY=` to your key.
+3. Check that the key works. You should see a list of available models:
 
    ```bash
    python -m statetrace models
    ```
 
-4. Restart `python -m statetrace serve`. The top bar shows **Nemotron ready**.
+4. Restart TaskMaster. The top bar now shows **Nemotron ready**.
 
-With a key you can add updates (**N**), ask questions in plain English (**/**), reconstruct the catch-up with Nemotron
-(**C**), get a project review (**R**), apply or discard proposed changes from imported Yosys reports, and have
-synthesis comparisons explained.
+You can now add your own updates (**N**), ask questions (**/**), have Nemotron reconstruct where you left off (**C**),
+request a project review (**R**), and get explanations of Yosys comparisons.
 
-Optional: build five sample projects (including a MAC unit with real Yosys reports) through the live model. This makes
-about 50 Nemotron calls and takes a few minutes:
+**More examples:** with a key, this builds five example projects, including a MAC unit with real Yosys reports. It takes
+a few minutes:
 
 ```bash
 python -m statetrace --db demo.db seed
 python -m statetrace --db demo.db serve
 ```
 
-## Using TaskMaster
+## Everyday use
 
-- **Add update** (**N**): paste a note, log or report and choose its source. An artifact source (sim log, test
-  output, synthesis report…) can verify a claim; a note or chat can't.
-- **Keep projects separate** by workspace: `python -m statetrace --db my-work.db serve`.
-- **Import Git commits** from the project's *Inbox*. Commits are staged, and nothing changes until you accept them.
-- Press **?** in the app for all keyboard shortcuts.
-- Full guide: [docs/GUIDE.md](docs/GUIDE.md). Windows desktop companion (hotkey popup, optional notifications):
-  [docs/COMPANION.md](docs/COMPANION.md).
-- Run the tests: `python -m unittest discover -s tests`
+- **Add an update:** press **N**, paste your note, log or report, and choose where it came from. Logs, test output and
+  reports can verify a result; notes and chats are recorded as reported.
+- **Keep work separate:** each workspace is its own file, e.g. `python -m statetrace --db my-chip.db serve`.
+- **Shortcuts:** press **?** in the app to see them all.
+- **Learn more:** the [user guide](docs/GUIDE.md) covers every screen. The [desktop companion guide](docs/COMPANION.md)
+  covers the Windows shortcut window and notifications.
 
-## Limitations
+## Good to know
 
-- Nemotron calls take about 4–30 seconds. Without network access, updates are saved and applied when Nebius is reachable.
-- The model can still misjudge what an update means. Its proposals are validated, cited and visible in history, but not
-  always right.
-- Review before commit covers Yosys imports in the web app; other updates are applied right after validation.
-- The keyless sample is a single project. The desktop companion is Windows-only. Tested on Windows only.
+- **You stay in control.** Nemotron suggests and TaskMaster checks, but you can always see what changed and why. For
+  Yosys reports, you approve each change before it's applied.
+- **Nemotron takes a moment.** Each request usually takes a few seconds and can take up to about 30. A timer shows
+  progress, and you can keep working meanwhile.
+- **Works offline.** Updates are saved immediately and processed once Nebius is reachable again.
+- **Platforms:** developed and tested on Windows. The main app uses only standard Python, so it should also run on
+  macOS and Linux, though these haven't been tested yet. The desktop companion is Windows-only.
 
-## Security
+## Privacy
 
-- Your API key stays in `.env` (git-ignored) and is read only by the local server. It is never sent to the browser.
-- The server listens on `127.0.0.1` only and refuses requests from other websites.
-- Workspace databases (`*.db`) are git-ignored and stay on your machine.
+- Your API key stays in `.env` on your computer and is never sent to the browser.
+- TaskMaster runs locally (`127.0.0.1`), and your projects stay in local database files.
+- It only reads what you give it, or Git repositories you choose to connect.
 
 ## License
 
