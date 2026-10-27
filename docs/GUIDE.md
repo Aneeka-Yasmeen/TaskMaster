@@ -1,259 +1,205 @@
-# TaskMaster: complete guide
+# TaskMaster user guide
 
-TaskMaster answers **"Where did I leave my project?"** It keeps an evidence log for each project,
-reconstructs what is currently true from that evidence, and uses **NVIDIA Nemotron** (via Nebius
-Token Factory) as an assistant that reasons, compares and suggests. **It never acts on its own.**
+TaskMaster answers one question: **"Where did I leave my project?"** It keeps a log of evidence for each project
+(notes, logs, reports, commits), works out what is currently true from that evidence, and shows what every statement
+is based on. **NVIDIA Nemotron** (through Nebius Token Factory) reads the evidence and suggests changes; TaskMaster
+checks them before anything is saved.
+
+For installation, see the [README](../README.md).
 
 ---
 
 ## 1. Start and stop
 
-| What | How |
+| To… | Do this |
 |---|---|
-| **Start** | `python -m statetrace serve`, then open http://127.0.0.1:8765 |
-| Start with the Windows hotkey helper | Double-click `scripts\TaskMaster-Companion.cmd`, or `python -m statetrace --db demo.db companion` (see [COMPANION.md](COMPANION.md)) |
-| Open the full dashboard | http://127.0.0.1:8765 in any browser, or the ↗ icon / *Open full dashboard* in the compact window |
-| Open the compact window | **Ctrl+Alt+T** from any app (while the companion runs) |
-| **Quit** | **Ctrl+Q** in the dashboard or compact window, **Settings → Quit TaskMaster**, **Quit** in the compact window's footer, or `python -m statetrace stop`, or Ctrl+C / close the console window that started it |
+| Start | `python -m statetrace serve`, then open http://127.0.0.1:8765 |
+| Start with the Windows hotkey window | `python -m statetrace companion` (see [COMPANION.md](COMPANION.md)) |
+| Use a separate workspace | Add `--db name.db`, e.g. `python -m statetrace --db asic.db serve` |
+| Stop | **Ctrl+Q** in the app, **Settings → Quit TaskMaster**, `python -m statetrace stop`, or **Ctrl+C** in the terminal |
 
-- Closing the compact window or a browser tab does **not** quit TaskMaster.
-- Ctrl+C works only in a real Windows console (PowerShell, cmd, Windows Terminal, the `.cmd` window).
-  It doesn't reach Windows Python from Git Bash, and it can't stop a copy started from somewhere else.
-  In those cases use Quit or `stop`.
-- Your data is always saved; quitting never loses anything.
-
-Use one database per purpose, e.g. `--db demo.db` for trying things and `--db asic.db` for your real ASIC project.
-A new database starts empty: click **Load sample project** (no API key needed) or add your first update.
+- Everything is saved automatically. Closing a browser tab does not stop TaskMaster.
+- A new workspace starts empty. Click **Load sample project** to explore an example (no API key needed), or add
+  your first update.
+- Ctrl+C works in PowerShell, cmd and Windows Terminal, but not in Git Bash. Use **Quit** or
+  `python -m statetrace stop` there.
 
 ---
 
-## 2. Screen map
+## 2. The screens
 
-```
-┌───────────── sidebar ─────────────┬──────────────────── top bar ────────────────────────────┐
-│ ✓ TaskMaster                      │ Today › …        [Nemotron ready] [Simple|Detailed] 🕓 [+ Add update N] │
-│ ◎ Today                (T)        ├──────────────────────────────────────────────────────────┤
-│ ▢ Projects                         │                                                          │
-│ ⚡ Ask Nemotron          (/)        │                     main screen                          │
-│ PROJECT  [ project switcher ▾ ]    │                                                          │
-│ ◎ Current state                    │                                                          │
-│ ▤ Evidence                         │                                                          │
-│ ≡ Inbox                            │                                                          │
-│ ▸ More: Decisions · Questions · Activity                                                      │
-│ WORKSPACE  ⚙ Settings              │                                                          │
-│ [Keyboard shortcuts ?]             │                                                          │
-│ ● nemotron-3-super… Nebius         │                                                          │
-└───────────────────────────────────┴──────────────────────────────────────────────────────────┘
-```
-
-| Screen | Where / how to open | What it does |
+| Screen | How to open | What it shows |
 |---|---|---|
-| **Today** | Sidebar *Today*, or **T** | The **Focus now** card: the most urgent project, *why* it's first, its deadline countdown, blocker, next step and Nemotron's verdict. Buttons: Open project, Ask Nemotron, Add update, Review with Nemotron. Below: **Up next**, the other projects ranked with their reasons. Detailed layout adds upcoming deadlines, health numbers and all project cards |
-| **Projects** | Sidebar *Projects* | Table of all projects: health, blocker, next step, evidence count, confidence, last update |
-| **Project → Current state** | Click a project anywhere, or sidebar *Current state* | Header with a **Priority** selector (High/Normal/Low). **Nemotron's review** (verdict, going well, concerns, suggestions with *Use as update* / *Make milestone*). State cards: **Current blocker**, **Next step** (*proposed from evidence* or *committed* with due date), **Last action**, **Confidence**. Then contradictions (*Needs verification*), Milestones, and *Show all details*. Detailed adds the status table, time-travel slider, latest before/after change, timeline, decisions and questions |
-| **Evidence** | Sidebar *Evidence* | Every piece of evidence (searchable; artifacts vs reports), the claims each one supports, and the beliefs it made obsolete. Nothing here can be edited or deleted |
-| **Inbox** | Sidebar *Inbox* (shows "N new") | Connect a Git repository (Windows or WSL), *Scan now*, review staged commits, **Accept** or **Skip**, retry failed ones |
-| **Decisions** | Sidebar *More → Decisions* | Decision history (active / superseded / reversed, with reason and tradeoff) and what was tried |
-| **Questions** | *More → Questions* | Open → Investigating → Resolved; resolved only by evidence |
-| **Activity** | *More → Activity* | Every update across all projects by day; click one to see the state change it caused |
-| **Ask Nemotron** | Sidebar, or **/** | Ask anything. Nemotron answers first, citing evidence; the badge says *Nemotron* or *Stored state*. *Compare with the stored-state answer* shows the no-model version |
-| **Settings** | Sidebar *Settings* | Assistant & **Autonomy**, desktop companion (notifications, hotkey, pause, **Quit**), Display (text size, layout, theme), Reminders (quiet hours), Evidence sources, Trust rules |
-| **Reminders (bell 🕓)** | Top bar | Deadline, stale-project and new-commit reminders, each shown once, with *Dismiss* |
-| **Status chip** | Top bar | *Nemotron ready*, *Nemotron offline*, or *N waiting for Nemotron · Sync now* |
-| **Compact window** | **Ctrl+Alt+T** | Active project: Nemotron's verdict and top suggestion, blocker, next step (proposed/committed), latest change, next deadline. Quick buttons: Where did I leave off?, What's blocking me?, What should I do next?, Add update, Review Git imports, Open full dashboard, Quit |
-| **Why?** panels | *Why?* on any claim, or click any evidence chip (E12) | The evidence behind a belief, earlier beliefs it replaced, and related contradictions |
+| **Today** | Sidebar, or **T** | The project that needs attention first and why, then the others in order |
+| **Projects** | Sidebar | All projects with their health, blocker and next step |
+| **Current state** | Click a project | The **Where you left off** card, blocker, next step, milestones and contradictions |
+| **Evidence** | Sidebar | Every piece of evidence and the claims it supports. Evidence can't be edited or deleted |
+| **Inbox** | Sidebar | Git commits waiting for your review |
+| **Synthesis (Yosys)** | Sidebar | Imported Yosys reports, comparisons and proposed changes |
+| **Decisions, Questions, Activity** | Sidebar → *More* | Decision history, open questions, and every update across projects |
+| **Ask Nemotron** | Sidebar, or **/** | Ask a question in plain English |
+| **Settings** | Sidebar | Assistant, desktop companion, display, reminders, evidence sources |
 
-### Keyboard shortcuts (press **?** to see them in the app)
+Two layouts are available: **Simple** (the essentials) and **Detailed** (history, time travel, decisions and
+questions). Switch with **D** or the buttons in the top bar.
+
+### Keyboard shortcuts
 
 | Key | Action |
 |---|---|
-| **Ctrl+Alt+T** | Open/focus the compact window from any app |
-| **N** | Add an update to the current project |
-| **/** | Ask Nemotron |
-| **R** | Ask Nemotron to review the current project |
+| **N** | Add an update |
+| **C** | Ask Nemotron where you left off (rebuilds the catch-up card) |
+| **R** | Ask Nemotron to review the project |
+| **/** | Ask a question |
 | **T** | Go to Today |
-| **D** | Switch Simple ↔ Detailed |
-| **?** | Show shortcuts |
+| **D** | Switch Simple / Detailed |
+| **?** | Show all shortcuts |
 | **Ctrl+Enter** | Submit an update |
-| **Esc** | Close a panel/dialog |
-| **Ctrl+Q** | Quit TaskMaster (asks first; data is saved) |
+| **Esc** | Close a panel |
+| **Ctrl+Q** | Quit TaskMaster |
+| **Ctrl+Alt+T** | Open the compact window from any app (desktop companion only) |
 
 ---
 
-## 3. From a new project to a reconstructed state
+## 3. Your first project
 
-1. **Create the project.** Press **N** (or *+ Add update*). In *Project*, choose **+ New project…** and
-   type a name (e.g. "RISC-V ASIC"). The project is created immediately; it needs no model.
-2. **First update: the goal.** For example: *"Goal: 32-bit RISC-V core in sky130 with OpenLane, 50 MHz,
-   area < 1 mm², tape-out shuttle deadline Dec 15."* Choose **Note** (people's statements) or
-   **Artifact** (a log or report pasted in: sim log, synthesis/timing report, test output).
-3. **Update project.** Steps you'll see:
-   - *Reading evidence*;
-   - *Comparing with the previous state*: Nemotron proposes changes;
-   - *Checking for contradictions*;
-   - *Updating project state*: the validator applies only what passes the rules.
-
-   The result shows before → after, plus anything the validator **held back**.
-4. **Set priority and deadlines.** On the project page set **Priority: High** and *Add milestone*
-   (e.g. "GDS ready for shuttle", due Dec 15, remind 1 week and 1 day before). TaskMaster never invents
-   dates.
-5. **Ask Nemotron to review** (**R** or *Review now*). It compares the evidence with the goal and
-   deadlines and returns a verdict and suggestions.
-6. **Keep adding evidence** as you work: notes, pasted Yosys `stat` output, OpenLane metrics, sim
-   results, commits from the Inbox. Artifacts make claims **verified**; notes stay **reported**.
-7. **Come back days later:** open Today, or press Ctrl+Alt+T and click *Where did I leave off?*.
+1. **Create it.** Press **N**. Under *Project*, choose **+ New project…** and type a name.
+2. **Add the goal.** For example: *"Goal: 32-bit RISC-V core in sky130, 50 MHz, area under 1 mm², shuttle deadline
+   Dec 15."* Choose a source:
+   - **Note**, **chat**, **meeting**: something a person said. These stay **reported**.
+   - **Sim log**, **test output**, **synthesis report**, **timing report**…: an artifact. These can make a claim
+     **verified**.
+3. **Submit.** Nemotron reads the update and proposes changes; TaskMaster checks them and saves what passes. The
+   result shows what changed, and anything that was held back.
+4. **Add a deadline.** On the project page, click **Add milestone**. TaskMaster never invents dates.
+5. **Keep adding evidence** as you work: notes, pasted logs, reports, commits from the Inbox.
+6. **Come back later.** Open the project, or press **Ctrl+Alt+T** if the companion is running. The **Where you left
+   off** card is at the top.
 
 ---
 
-## 4. What Nemotron does, and what it doesn't
+## 4. Reading the "Where you left off" card
 
-Nemotron (`nvidia/nemotron-3-super-120b-a12b` on Nebius Token Factory) has three jobs:
+The card lists the next action, where things stand, what is established, blockers, uncertain items and open
+contradictions.
 
-1. **State engine proposer.** For every update, it reads the current claims plus the new evidence and
-   proposes operations: add, update, invalidate, contradict, resolve. A deterministic **validator**
-   applies only the operations that pass the trust rules. You can see exactly what Nemotron proposed
-   versus what was applied: click any timeline event → *Raw operations*.
-2. **Assistant for your questions.** *Where did I leave off?* and any other question go to Nemotron
-   **first**, grounded in the validated state, the evidence log, deadlines and the stored-state answer.
-   Its citations are checked; invented ones are marked `(?)`. If Nebius is unreachable, you get the
-   stored-state answer, clearly labelled.
-3. **Reviewer.** It compares where the evidence says you are with your goal and deadlines, then gives
-   a verdict (on track, at risk, off track, blocked), what's going well, concerns, up to 3 suggestions
-   and open questions.
-
-**What it never does:**
-- change a project by itself (reviews are stored separately and are never claims or evidence);
-- accept commits;
-- create deadlines;
-- mark something verified without an artifact.
-
-When you like a suggestion, *Use as update* or *Make milestone* sends it through the normal path, and
-you click to confirm.
-
-**Autonomy** (Settings → Assistant):
-
-| Level | What happens without you asking |
+| Label | Meaning |
 |---|---|
-| **Off** (default) | Nothing. Nemotron runs only when you add an update, ask, or click Review |
-| **Selected projects** | For ticked projects: Nemotron reviews after every new update, and the companion watches their Git sources |
+| **Verified** | Backed by a log, test or report |
+| **Reported** | A person said so; nothing confirms it yet |
+| **Contested** | Evidence conflicts; it needs to be settled |
+| **Nemotron's inference** | Nemotron's reading, not supported by any recorded claim |
+| **Nemotron's suggestion** | A next action Nemotron proposed that isn't recorded in the evidence |
+
+- Every labelled statement is the recorded claim itself, not Nemotron's wording. Click an evidence chip (e.g.
+  **E8**) to read the source, or **Why?** to see why the claim is believed.
+- Without an API key, the card is built directly from the recorded claims and says *Stored state only*.
+- With a key, press **C** to have Nemotron organise it. The result is saved for that version of the project, so
+  opening the project again doesn't call the model.
+
+---
+
+## 5. What Nemotron does
+
+Nemotron (`nvidia/nemotron-3-super-120b-a12b`) does the reading and reasoning:
+
+1. **Turns each update into changes**: which claims to add, update, close or flag as conflicting.
+2. **Writes the catch-up** card and **answers questions**, citing evidence.
+3. **Reviews a project** against its goal and deadlines: on track, at risk, off track or blocked, with suggestions.
+4. **Explains Yosys comparisons** and suggests the next experiment.
+
+What it can't do:
+- Mark something verified (only artifacts can).
+- Change a project on its own. Reviews and suggestions are advice; **Use as update** or **Make milestone** puts a
+  suggestion through the normal steps.
+- Accept commits or create deadlines.
+
+**Autonomy** (Settings → Assistant) controls what happens without you asking:
+
+| Setting | Effect |
+|---|---|
+| **Off** (default) | Nemotron runs only when you add an update, ask, or click Review |
+| **Selected projects** | Chosen projects are reviewed after each update, and the companion watches their Git sources |
 | **All projects** | The same for every project |
 
-Each model call costs Nebius credits. With Autonomy off, only your actions cause calls.
+Each Nemotron call uses Nebius credits and takes about 4–30 seconds.
 
-**Offline.** Updates are always saved locally first. If Nebius can't be reached, the update is stored
-and shown as *waiting for Nemotron*. The server checks every minute and applies waiting updates,
-oldest first, when it's back (or press *Sync now*). Viewing state, the stored-state answers, milestones
-and evidence all work offline.
+**Offline:** updates are always saved first. If Nebius can't be reached, they wait (*waiting for Nemotron*) and are
+applied in order once it is back, or straight away with **Sync now**.
 
 ---
 
-## 5. How data is stored
+## 6. Yosys synthesis reports
 
-Everything lives in one SQLite file per workspace (e.g. `demo.db`) in the TaskMaster folder.
+Open a project, then **Synthesis (Yosys)** in the sidebar.
 
-| Table | Contents |
+1. **Import** a report: Yosys `stat` output as text (e.g. `tee -o report.rpt stat`) or `stat -json`, up to 2 MB.
+   Example reports are in `demo/yosys/`. Importing the same file twice creates nothing new.
+2. **Review the proposed change.** Nemotron suggests how the report changes the project, and you see a before/after
+   comparison. Click **Apply to project state** or **Discard proposal**. The report is kept as evidence either way.
+   Without an API key, the report is still saved and can be compared.
+3. **Check the numbers**: total cells, cell types, and counts derived from cell names (flip-flops, LUTs and so on,
+   always marked *derived*).
+4. **Compare** two runs. TaskMaster calculates the differences itself and lists what the comparison can't tell you
+   (cell counts are not timing, power or area). Optional limits, such as maximum cells, are flagged when exceeded.
+5. **Explain with Nemotron** (needs a key): observations, possible causes and one next experiment. The explanation is
+   marked *interpretation, not evidence*, and **Accept as update** adds it only if you choose.
+
+---
+
+## 7. Git commits
+
+1. Open a project's **Inbox** and add a repository: a Windows path (`C:\work\asic`), or a WSL path
+   (`/home/name/asic`) with *Repository lives inside WSL2* ticked.
+2. Click **Scan now**. New commits are listed for review.
+3. **Accept** the ones that matter, or skip them. Nothing changes until you accept.
+
+Only the commit hash, date, author, branch, message and line counts are read, never file contents. A commit shows
+that a change was made, not that tests pass. That needs a log or report.
+
+---
+
+## 8. Deadlines, reminders and priority
+
+**Reminders** appear in the bell in the top bar (and as Windows notifications if the companion is set up):
+
+| Reminder | When |
 |---|---|
-| `events` | The **evidence log**: every update, with source, time it happened, time recorded, and reference. **Append-only**: database triggers refuse edits and deletes |
-| `state_versions` | A snapshot of the reconstructed state after each update (time travel, diffs, rebuild) |
-| `transitions` | For each update: what Nemotron proposed, what was applied, rejected or repaired, latency, errors |
-| `assistant_reviews` | Nemotron's reviews: opinions per state version, kept apart from the state |
-| `milestones` / `notices` | Your deadlines and the deduplicated reminders |
-| `sources` / `import_items` | Connected Git repositories and staged commits (pending, accepted, skipped, failed) |
-| `projects` | Names and your priority (High/Normal/Low) |
-| `settings` | Autonomy, companion, reminder and quiet-hour settings |
+| Deadline | 1 day and 2 hours before, by default (changeable per milestone) |
+| Overdue | Once, after the due time |
+| Stale project | No new evidence for 7 days |
+| Commits to review | After a background scan finds new commits |
 
-- The API key lives only in `.env`, read by the local server. It never reaches the browser, exports or
-  logs.
-- The server listens on 127.0.0.1 only and refuses requests from other websites.
+Each reminder appears once. Quiet hours (22:00–08:00 by default) hold back pop-ups. Change these in
+**Settings → Reminders**.
 
----
+A milestone is marked **at risk**, with the reason, when it is due within 72 hours, due within 7 days while the
+project is blocked or contested, or due within 14 days while the project is stale.
 
-## 6. Monitoring
+**Priority** decides which project appears first on Today. The reasons are always shown:
 
-- **What's monitored:** only Git repositories you connect in a project's **Inbox**, for projects
-  Autonomy allows, and only while the companion runs.
-  - Windows path: `C:\work\asic`.
-  - WSL path: `/home/you/asic`, with *Repository lives inside WSL2* ticked (uses `wsl git`).
-- **What is read:** commit hash, date, author, branch, message and line counts. No diffs, no file
-  contents.
-- **What happens:**
-  1. New commits are **staged** in the Inbox. Nothing changes until you **Accept**.
-  2. Accepted commits go through Nemotron and the validator like any update.
-  3. A commit can show that a change was made, but never that tests pass or timing is met; that needs a
-     log or report artifact.
-- **Not monitored:** your terminal, keystrokes, screen, arbitrary folders, GitHub/GitLab. To feed
-  results in today, paste a report into *Add update → Artifact*, or from the CLI:
-  `python -m statetrace -p asic add -s timing_report -f runs/run1/final/metrics.csv "OpenLane run 1"`.
+| Reason | Points |
+|---|---|
+| Overdue deadline | 100 |
+| Deadline in ≤3 / ≤7 / ≤14 days | 80 / 60 / 30 |
+| Marked High / Low priority | +40 / −30 |
+| Blocked | +20 |
+| Unresolved contradiction | +15 |
+| Nemotron's review: off track or blocked / at risk | +15 / +8 |
+| Updates waiting to sync | +10 |
+| Stale | +10 |
+| Commits to review | +5 |
+
+Set a project's priority from its page header.
 
 ---
 
-## 6b. Synthesis runs (Yosys skill)
+## 9. Your data and privacy
 
-Open a project → sidebar **Synthesis (Yosys)** (or the *Synthesis runs* card on the project page, or
-*Synthesis runs* in the compact window).
-
-1. **Import** a Yosys report: text `stat` output (`tee -o report.rpt stat` after `synth`) or `stat -json`,
-   up to 2 MB. TaskMaster hashes it (sha256), parses it as data (never instructions), and records it as a
-   `synthesis_report` **evidence** item, so its measurements are *verified*. Importing identical content
-   again creates nothing new; a new run never overwrites an older one.
-2. **Review** the extracted metrics: totals exactly as reported, the cell-type breakdown, and counts
-   *derived from cell names* (flip-flops, LUTs, DSP, memory primitives), which are always labelled
-   derived. Anything the report doesn't contain is simply absent. Unreadable lines and ambiguities
-   (e.g. several modules without a hierarchy summary) are listed, not guessed.
-3. **Choose a baseline** run and **Compare**. TaskMaster computes absolute and % changes (undefined % when
-   the baseline is 0), new and disappeared cell types, and **limitations** (different libraries, scopes
-   or top modules; cell counts are not timing, power or physical area). Optional **limits** (max cells,
-   flip-flops, LUTs, chip area) are flagged only when the report measures them.
-4. **Explain with Nemotron.** Nemotron receives the computed comparison and project context (never the
-   raw file) and returns observations, hypotheses with confidence, evidence that would settle them, and
-   one next experiment. Citations are checked. The explanation is labelled *interpretation, not
-   evidence* and never changes the project. If Nebius is down, the comparison stays and the explanation
-   says it's unavailable.
-5. **Accept the next experiment** with *Accept as update* or *Make milestone*. Nothing happens until you
-   click.
-
-CLI: `synth-import FILE`, `synth-runs`, `synth-compare RUN BASELINE`, `synth-explain COMPARISON`.
-
-## 7. Alerts and reminders
-
-| Alert | When | Where you see it |
-|---|---|---|
-| **Deadline reminder** | At the offsets you chose (default 1 day and 2 hours before) | Bell; toast in the dashboard; Windows notification if enabled |
-| **Overdue** | After the due time, once | Same |
-| **Stale project** | No new evidence for 7+ days, once per stale period | Same |
-| **Commits waiting for review** | A background scan staged new commits | Same (companion + Autonomy on) |
-| **At-risk flag** | Deadline ≤72 h, or within 7 days while blocked/contested, or within 14 days while stale | On the milestone, the Focus card and in Up next, with the reason |
-
-- **Rules:**
-  - each issue is reported **once** (rescheduling re-arms it);
-  - quiet hours (default 22:00–08:00) hold back pop-ups;
-  - Windows notifications are **off by default** and need Autonomy on;
-  - notifications never include commit messages or blocker text.
-- **Configure:** Settings → Reminders (quiet hours, defaults) and Settings → Desktop companion
-  (Windows notifications, test notification).
-
----
-
-## 8. Priority: why a project is first
-
-The score is deterministic, and the reasons are shown next to the project:
-
-- overdue deadline **100**; due ≤3 days **80**; ≤7 days **60**; ≤14 days **30**
-- High priority **+40** (Low −30)
-- blocked **+20**; unresolved contradiction **+15**
-- updates waiting to sync **+10**; stale **+10**; commits to review **+5**
-- Nemotron's latest verdict: off track or blocked **+15**, at risk **+8**
-
-Set a project's priority in its header.
-
----
-
-## 9. Trust rules (enforced in code)
-
-1. Every claim cites real evidence; invented citations are removed.
-2. **Verified** needs an artifact (log, report, test, CI). Notes and chats are **reported**.
-3. A commit proves a change happened, not that something passes or works.
-4. Weaker evidence can't overwrite a verified fact; it opens a **contradiction** (*Needs verification*).
-5. Old evidence can't overwrite or contest newer beliefs.
-6. Nothing is deleted. Beliefs are superseded or invalidated with the evidence that ended them.
-7. Nemotron advises; the validator decides; you act.
+- Each workspace is one file (`statetrace.db` by default) in the TaskMaster folder. It stays on your computer.
+- Evidence is never edited or deleted. Older beliefs are kept and marked as replaced, so you can always see what
+  changed and why.
+- The API key stays in `.env` and is only read by the local server. It never reaches the browser.
+- TaskMaster runs on your computer only (`127.0.0.1`) and refuses requests from other websites.
+- Nothing is monitored except Git repositories you add, and only when Autonomy allows it and the companion is
+  running. There is no screen, keyboard or folder monitoring.
